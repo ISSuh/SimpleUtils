@@ -14,80 +14,64 @@
 #include <utility>
 #include <tuple>
 
+#include "Helper.hpp"
+
 namespace sUtils {
 
-namespace helper {
-    template <int... Is>
-    struct index {};
+// class Action {
+//  public:
+//     template <typename F>
+//     explicit Action(F&& func) : f(std::forward<F>(func)) {}
 
-    template <int N, int... Is>
-    struct gen_seq : gen_seq<N - 1, N - 1, Is...> {};
+//     template <typename... Args, int... Is>
+//     void func(std::tuple<Args...>& tup, helper::index<Is...>) {
+//         f(std::get<Is>(tup)...);
+//     }
 
-    template <int... Is>
-    struct gen_seq<0, Is...> : index<Is...> {};
-}  // namespace helper
+//     template <typename... Args>
+//     void func(const std::tuple<Args...>& tup) {
+//         func(tup, helper::gen_seq<sizeof...(Args)>{});
+//     }
 
-class Action {
- public:
-    template <typename F>
-    explicit Action(F&& func) : f(std::forward<F>(func)) {}
+//     template<typename... Args>
+//     void act(Args&&... args) {
+//         std::tuple<Args...> params(std::forward<Args>(args)...);
 
-    template <typename... Args, int... Is>
-    void func(std::tuple<Args...>& tup, helper::index<Is...>) {
-        f(std::get<Is>(tup)...);
-    }
+//         func(params);
+//     }
+// };
 
-    template <typename... Args>
-    void func(const std::tuple<Args...>& tup) {
-        func(tup, helper::gen_seq<sizeof...(Args)>{});
-    }
+// template <typename F>
+// Action make_action(F&& f) {
+//     return Action (std::forward<F>(f));
+// }
 
-    template<typename... Args>
-    void act(Args&&... args) {
-        std::tuple<Args...> params(std::forward<Args>(args)...);
+// class FunctionMapper {
+//  public:
+//   FunctionMapper() = default;
+//   ~FunctionMapper() = default;
 
-        func(params);
-    }
-};
+//   template<typename F, typename ...Args>
+//   void bindFunction(const std::string& name, F&& f) {
+//     registFunction(name, std::forward<F>(f));
+//   }
 
-template <typename F>
-Action make_action(F&& f) {
-    return Action (std::forward<F>(f));
-}
+//   template<typename ...Args>
+//   void call(const std::string& name, Args&& ...args) {
+//     m_functionMap[name](std::forward<Args...>(args...));
+//   }
 
-class FunctionMapper {
- public:
-  FunctionMapper();
-  ~FunctionMapper();
+//  private:
+//   template<typename F, typename ...Args>
+//   void registFunction(const std::string& name, F&& f) {
+//     m_functionMap[name] = std::forward<F>(f);
+//   }
 
-  template<typename F>
-  void bindFunction(const std::string& name, F&& f) {
-    registFunction(name, std::forward<F>(f));
-  }
+//  private:
+//   std::map<std::string, std::function<void()>> m_functionMap;
+// };
 
-  template<typename ...Args>
-  void call(const std::string& name, Args&& ...args) {
-    m_funcMap[name](std::forward<Args>(args));
-  }
-
- private:
-  template<typename F>
-  struct invoker {
-    template<typename... Args>
-    void caller(F f, Args&& ...args) {
-      f(std::forward<f>(f)(std::forward<Args>(args)));
-    }
-  };
-
- private:
-  template<typename F>
-  void registFunction(const std::string& name, F&& f) {
-    m_funcMap[name] = {  }
-  }
-
- private:
-  std::map<std::string, std::function<void()>> m_funcMap;
-};
+// Check if a function signature "R(A)" only uses arithmetic types
 
 }  // namespace sUtils
 
