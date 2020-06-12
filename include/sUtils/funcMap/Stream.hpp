@@ -7,8 +7,12 @@
 #ifndef SUTILS_FUNCMAP_STREAM_HPP_
 #define SUTILS_FUNCMAP_STREAM_HPP_
 
+#pragma once
+
 #include <vector>
 #include <utility>
+
+#include "Helper.hpp"
 
 namespace sUtils {
 namespace stream {
@@ -52,22 +56,22 @@ class Stream {
     return &m_buf[index];
   }
 
-  template <typename T>
-  Stream& operator<<(Stream& s, const T& v) {
-    ParamTraits<T>::write(s, v);
-      return s;
-  }
-
-  template <typename T>
-  Stream& operator>>(Stream& s, T& v) {
-    ParamTraits<T>::read(s, v);
-      return s;
-  }
-
  private:
   std::vector<char> m_buf;
   int m_readpos = 0;
 };
+
+template <typename T>
+Stream& operator<<(Stream& s, const T& v) {
+  helper::ParamTraits<T>::write(s, v);
+    return s;
+}
+
+template <typename T>
+Stream& operator>>(Stream& s, T& v) {
+  helper::ParamTraits<T>::read(s, v);
+    return s;
+}
 
 }  // namespace stream
 }  // namespace sUtils

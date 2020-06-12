@@ -29,6 +29,7 @@ template <int... Is>
 struct gen_seq<0, Is...> : index<Is...> {};
 
 //////////////////////////////////////////////////
+// Type Traits
 
 // By default all types are invalid
 template <typename T, typename ENABLE = void>
@@ -161,10 +162,22 @@ struct ParamTraits<const char*> {
   static const char* get(const store_type& v) { return v.c_str(); }
 };
 
+template <int N>
+struct ParamTraits<char[N]> : ParamTraits<const char*> {};
+template <int N>
+struct ParamTraits<const char[N]> : ParamTraits<const char*> {};
+template <int N>
+struct ParamTraits<const char (&)[N]> : ParamTraits<const char*> {};
+
+
 template <>
-struct ParamTraits<const std::string&> {
+struct ParamTraits<std::string> : ParamTraits<const char*> {
   static constexpr bool valid = true;
-  using store_type = std::string;
+
+  template <typename S>
+  static void write(S& s, const char* v) { 
+    StringTraits::write(s, v);
+  }
 
   template <typename S>
   static void write(S& s, const std::string& v) { 
@@ -172,7 +185,7 @@ struct ParamTraits<const std::string&> {
   }
 
   template <typename S>
-  static void read(S& s, store_type& v) {
+  static void read(S& s, std::string& v) {
     StringTraits::read(s, v);
   }
 
@@ -180,8 +193,37 @@ struct ParamTraits<const std::string&> {
 };
 
 //////////////////////////////////////////////////
+// Tuple Traits
 
-template <typename... T> struct ParamPack {
+template <typename T, bool Done, int N>
+struct Tuple {
+  template <typename S>
+  static void deserialize(S& s, T& v) {
+    s >> std::get<N>(v);
+    Tuple<T, N == std::tuple_size<T>::value - 1, N + 1>::deserialize(s, v);
+  }
+
+  template <typename S>
+  static void serialize(S& s, const T& v) {
+    s << std::get<N>(v);
+    Tuple<T, N == std::tuple_size<T>::value - 1, N + 1>::serialize(s, v);
+  }
+};
+
+template <typename T, int N>
+struct Tuple<T, true, N> {
+  template <typename S>
+  static void deserialize(S&, T&) {}
+
+  template <typename S>
+  static void serialize(S&, const T&) {}
+};
+
+//////////////////////////////////////////////////
+// Function Parameter Traits
+
+template <typename... T>
+struct ParamPack {
   static constexpr bool valid = true;
 };
 
@@ -190,11 +232,13 @@ struct ParamPack<First> {
   static constexpr bool valid = ParamTraits<First>::valid;
 };
 
-template <typename First, typename... Rest> struct ParamPack<First, Rest...> {
+template <typename First, typename... Rest>
+struct ParamPack<First, Rest...> {
   static constexpr bool valid = (ParamTraits<First>::valid && ParamPack<Rest...>::valid);
 };
 
 //////////////////////////////////////////////////
+// Funtion Traits
 
 template <typename F> struct FuncTraits {};
 
@@ -235,6 +279,7 @@ struct FuncTraits<R(Args...)> {
 };
 
 //////////////////////////////////////////////////
+// serialize
 
 template <typename F, int N>
 struct Parameters {
@@ -247,6 +292,31 @@ struct Parameters {
     Traits::write(s, std::forward<First>(first));
     Parameters<F, N + 1>::serialize(s, std::forward<Rest>(rest)...);
   }
+};
+
+//////////////////////////////////////////////////
+// deserialize
+
+template <typename... T>
+struct ParamTraits<std::tuple<T...>> {
+  using tuple_type = std::tuple<T...>;
+  using store_type = tuple_type;
+  static constexpr bool valid = ParamPack<T...>::valid;
+
+  static_assert(ParamPack<T...>::valid == true,
+              "One or more tuple elements are not of valid RPC parameter types.");
+
+  template <typename S>
+  static void write(S& s, const tuple_type& v) {
+    Tuple<tuple_type, std::tuple_size<tuple_type>::value == 0, 0>::serialize(s, v);
+  }
+
+  template <typename S>
+  static void read(S& s, tuple_type& v) {
+    Tuple<tuple_type, std::tuple_size<tuple_type>::value == 0, 0>::deserialize(s, v);
+  }
+
+  static tuple_type&& get(tuple_type&& v) { return std::move(v); }
 };
 
 //////////////////////////////////////////////////

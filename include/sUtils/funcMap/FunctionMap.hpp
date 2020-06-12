@@ -15,6 +15,7 @@
 #include <tuple>
 
 #include "Helper.hpp"
+#include "Stream.hpp"
 
 namespace sUtils {
 
