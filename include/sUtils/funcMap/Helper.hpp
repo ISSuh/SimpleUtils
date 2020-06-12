@@ -15,7 +15,6 @@
 #include <tuple>
 
 namespace sUtils {
-
 namespace helper {
 
 //////////////////////////////////////////////////
@@ -233,6 +232,21 @@ struct FuncTraits<R(Args...)> {
     static_assert(N < arity, "error: invalid parameter index.");
     using type = typename std::tuple_element<N, std::tuple<Args...>>::type;
   };
+};
+
+//////////////////////////////////////////////////
+
+template <typename F, int N>
+struct Parameters {
+  template <typename S>
+  static void serialize(S&) {}
+
+  template <typename S, typename First, typename... Rest>
+  static void serialize(S& s, First&& first, Rest&&... rest) {
+    using Traits = ParamTraits<typename FuncTraits<F>::template argument<N>::type>;
+    Traits::write(s, std::forward<First>(first));
+    Parameters<F, N + 1>::serialize(s, std::forward<Rest>(rest)...);
+  }
 };
 
 //////////////////////////////////////////////////
