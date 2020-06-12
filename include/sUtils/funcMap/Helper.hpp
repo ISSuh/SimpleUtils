@@ -38,6 +38,12 @@ struct ParamTraits {
   using store_type = int;
 };
 
+template <>
+struct ParamTraits<void> {
+    static constexpr bool valid = true;
+	using store_type = void;
+};
+
 // Support for any arithmetic type
 template <typename T>
 struct ParamTraits<T,
@@ -193,6 +199,10 @@ template <typename First, typename... Rest> struct ParamPack<First, Rest...> {
 
 template <typename F> struct FuncTraits {};
 
+// function
+template <typename R, typename... Args>
+struct FuncTraits<R(*)(Args...)> : public FuncTraits<R(Args...)> {};
+
 // method pointer
 template <typename R, typename C, typename... Args>
 struct FuncTraits<R (C::*)(Args...)> : public FuncTraits<R(Args...)> {
@@ -205,10 +215,15 @@ struct FuncTraits<R (C::*)(Args...) const> : public FuncTraits<R(Args...)> {
   using class_type = C;
 };
 
+// lambda fucntion
+template <typename T>
+struct FunctionTraits : public FunctionTraits<decltype(&T::operator())> {};
+
 template <typename R, typename... Args>
 struct FuncTraits<R(Args...)> {
-  using return_type = R; static constexpr bool valid =
-      ParamTraits<return_type>::valid && ParamPack<Args...>::valid;
+  using return_type = R;
+  static constexpr bool valid =
+      (ParamTraits<return_type>::valid && ParamPack<Args...>::valid);
 
   using param_tuple = std::tuple<typename ParamTraits<Args>::store_type...>;
   static constexpr std::size_t arity = sizeof...(Args);

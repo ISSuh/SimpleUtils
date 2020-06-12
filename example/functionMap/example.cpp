@@ -38,14 +38,20 @@ int main() {
   static_assert(ParamTraits<const double&>::valid == true, "Invalid");
   static_assert(ParamTraits<double*>::valid == true, "Invalid");
   static_assert(ParamTraits<std::vector<int>>::valid == true, "Invalid");
+  static_assert(ParamTraits<const std::string&>::valid == true, "Invalid");
+  static_assert(ParamTraits<const char*>::valid == true, "Invalid");
 
-  //  ERROR
-  static_assert(ParamTraits<const std::string&>::valid == true, "");
-  static_assert(ParamTraits<const char*>::valid == true, "");
+  using TraitsHelloWorld = FuncTraits<decltype(&HelloWorld)>;
+  static_assert(TraitsHelloWorld::valid, "Invalid");
 
-  using Traits = FuncTraits<decltype(&sum)>;
-  static_assert(Traits::valid, "");
-  Traits::argument<0>::type p0;
+  using TraitsPrintArg = FuncTraits<decltype(&printArg)>;
+  static_assert(TraitsPrintArg::valid, "Invalid");
+  TraitsPrintArg::argument<0>::type p0{};
+
+  using TraitsSum = FuncTraits<decltype(&sum)>;
+  static_assert(TraitsSum::valid, "Invalid");
+  TraitsSum::argument<0>::type p2 = 0;
+  TraitsSum::argument<1>::type p3 = 0;
 
   return 0;
 }
