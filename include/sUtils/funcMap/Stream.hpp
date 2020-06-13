@@ -64,13 +64,13 @@ class Stream {
 template <typename T>
 Stream& operator<<(Stream& s, const T& v) {
   helper::ParamTraits<T>::write(s, v);
-    return s;
+  return s;
 }
 
 template <typename T>
 Stream& operator>>(Stream& s, T& v) {
   helper::ParamTraits<T>::read(s, v);
-    return s;
+  return s;
 }
 
 }  // namespace stream

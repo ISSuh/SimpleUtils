@@ -1,0 +1,186 @@
+/**
+ * 
+ *  Copyright:  Copyright (c) 2020, ISSuh
+ * 
+ */
+
+#ifndef SUTILS_FUNCMAP_HELPER_TYPETRAITS_HPP_
+#define SUTILS_FUNCMAP_HELPER_TYPETRAITS_HPP_
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <functional>
+#include <utility>
+#include <tuple>
+
+namespace sUtils {
+namespace helper {
+
+// Type Traits
+
+// By default all types are invalid
+template <typename T, typename ENABLE = void>
+struct TypeTraits {
+  static constexpr bool valid = false;
+  using store_type = int;
+};
+
+template <>
+struct TypeTraits<void> {
+    static constexpr bool valid = true;
+	using store_type = void;
+};
+
+// Support for any arithmetic type
+template <typename T>
+struct TypeTraits<T,
+                   typename std::enable_if<std::is_arithmetic<T>::value>::type
+                  > {
+  static constexpr bool valid = true;
+  using store_type = T;
+
+  template <typename S>
+  static void write(S& s, T v) { s.write(&v, sizeof(v)); }
+
+  template <typename S>
+  static void read(S& s, store_type& v) { s.read(&v, sizeof(v)); }
+
+  static store_type get(store_type v) { return v; }
+};
+
+// Generic support for const T&, for any valid T
+template <typename T> struct TypeTraits<T&> : TypeTraits<T> {
+  static_assert(TypeTraits<T>::valid, "Invalid RPC parameter type");
+};
+
+template <typename T> struct TypeTraits<const T&> : TypeTraits<T> {
+  static_assert(TypeTraits<T>::valid, "Invalid RPC parameter type");
+};
+
+template <typename T> struct TypeTraits<T*> : TypeTraits<T> {
+  static_assert(TypeTraits<T>::valid, "Invalid RPC parameter type");
+};
+
+template <typename T>
+struct TypeTraits<const T*> : TypeTraits<T> {
+  static_assert(TypeTraits<T>::valid, "Invalid RPC parameter type");
+};
+
+template <typename T> struct TypeTraits<T* const> : TypeTraits<T> {
+  static_assert(TypeTraits<T>::valid, "Invalid RPC parameter type");
+};
+
+template <typename T>
+struct TypeTraits<std::vector<T>> {
+  using store_type = std::vector<T>;
+  static constexpr bool valid = TypeTraits<T>::valid;
+  static_assert(TypeTraits<T>::valid == true, "T is not valid RPC parameter type.");
+
+  // Write the vector size, followed by  each element
+  template <typename S>
+  static void write(S& s, const std::vector<T>& v) {
+    unsigned len = static_cast<unsigned>(v.size());
+    s.write(&len, sizeof(len));
+    for (auto&& i : v){
+      TypeTraits<T>::write(s, i);
+    }
+  }
+
+  template <typename S>
+  static void read(S& s, std::vector<T>& v) {
+    unsigned len;
+    s.read(&len, sizeof(len));
+    v.clear();
+    while (len--) {
+      T i;
+      TypeTraits<T>::read(s, i);
+      v.push_back(std::move(i)); 
+    }
+  }
+
+  static std::vector<T>&& get(std::vector<T>&& v) { return std::move(v); }
+};
+
+struct StringTraits {
+  template <typename S>
+  static void write(S& s, const char* v) {
+    int len = static_cast<int>(strlen(v));
+    s.write(&len, sizeof(len));
+    s.write(v, len);
+  }
+
+  template <typename S>
+  static void write(S& s, const std::string& v) {
+    int len = static_cast<int>(v.size());
+    s.write(&len, sizeof(len));
+    s.write(v.c_str(), len);
+  }
+
+  template <typename S>
+  static void read(S& s, std::string& v) {
+    int len;
+    s.read(&len, sizeof(len));
+    v.clear();
+
+    if (len) {
+      v.reserve(len);
+      v.append(len, 0);
+      s.read(&v[0], len);
+    }
+  }
+};
+
+// Barebones for const char* support
+template <>
+struct TypeTraits<const char*> {
+  static constexpr bool valid = true;
+  using store_type = std::string;
+
+  template <typename S>
+  static void write(S& s, const char* v) { 
+    StringTraits::write(s, v);
+  }
+
+  template <typename S>
+  static void read(S& s, store_type& v) {
+    StringTraits::read(s, v);
+  }
+
+  static const char* get(const store_type& v) { return v.c_str(); }
+};
+
+template <int N>
+struct TypeTraits<char[N]> : TypeTraits<const char*> {};
+template <int N>
+struct TypeTraits<const char[N]> : TypeTraits<const char*> {};
+template <int N>
+struct TypeTraits<const char (&)[N]> : TypeTraits<const char*> {};
+
+
+template <>
+struct TypeTraits<std::string> : TypeTraits<const char*> {
+  static constexpr bool valid = true;
+
+  template <typename S>
+  static void write(S& s, const char* v) { 
+    StringTraits::write(s, v);
+  }
+
+  template <typename S>
+  static void write(S& s, const std::string& v) { 
+    StringTraits::write(s, v);
+  }
+
+  template <typename S>
+  static void read(S& s, std::string& v) {
+    StringTraits::read(s, v);
+  }
+
+  static const std::string& get(const store_type& v) { return v; }
+};
+
+}  // namespace helper
+}  // namespace sUtils
+
+#endif  // SUTILS_FUNCMAP_HELPER_TYPETRAITS_HPP_
