@@ -19,6 +19,35 @@ namespace helper {
  * Function Parameter Traits
  */
 
+struct return_void {};
+struct return_non_void{};
+struct arg_count_zero{};
+struct arg_count_non_zero{};
+
+template<typename R>
+struct FunctReturnTrait {
+  using type = return_non_void;
+};
+
+template<>
+struct FunctReturnTrait<void> {
+  using type = return_void;
+};
+
+template<int n>
+struct FunctArgsTrait {
+  using type = arg_count_non_zero;
+};
+
+template<>
+struct FunctArgsTrait<0> {
+  using type = arg_count_zero;
+};
+
+/**
+ * Function Parameter Traits
+ */
+
 template <typename... T>
 struct ParamPackTraits {
   static constexpr bool valid = true;
@@ -42,6 +71,27 @@ template <typename F> struct FuncTraits {};
 
 // function
 template <typename R, typename... Args>
+struct FuncTraits<R(Args...)> {
+  using return_type = R;
+  using return_type_info = typename FunctReturnTrait<return_type>::type;
+
+  static constexpr std::size_t arg_count = sizeof...(Args);
+  using arg_count_info = typename FunctArgsTrait<arg_count>::type;
+
+  using param_tuple = std::tuple<typename TypeTraits<Args>::store_type...>;
+  static constexpr bool valid =
+      (TypeTraits<return_type>::valid && ParamPackTraits<Args...>::valid);
+
+  template <std::size_t N>
+  struct argument {
+    static_assert(N < arg_count, "error: invalid parameter index.");
+
+    using type = typename std::tuple_element<N, std::tuple<Args...>>::type;
+  };
+};
+
+// function pointer
+template <typename R, typename... Args>
 struct FuncTraits<R(*)(Args...)> : public FuncTraits<R(Args...)> {};
 
 // class member method pointer
@@ -54,24 +104,6 @@ struct FuncTraits<R (C::*)(Args...)> : public FuncTraits<R(Args...)> {
 template <typename R, typename C, typename... Args>
 struct FuncTraits<R (C::*)(Args...) const> : public FuncTraits<R(Args...)> {
   using class_type = C;
-};
-
-// const method pointer
-template <typename R, typename... Args>
-struct FuncTraits<R(Args...)> {
-  using return_type = R;
-  static constexpr bool valid =
-      (TypeTraits<return_type>::valid && ParamPackTraits<Args...>::valid);
-
-  using param_tuple = std::tuple<typename TypeTraits<Args>::store_type...>;
-  static constexpr std::size_t arg_count = sizeof...(Args);
-
-  template <std::size_t N>
-  struct argument {
-    static_assert(N < arg_count, "error: invalid parameter index.");
-
-    using type = typename std::tuple_element<N, std::tuple<Args...>>::type;
-  };
 };
 
 // lambda fucntion

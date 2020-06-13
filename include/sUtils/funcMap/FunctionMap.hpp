@@ -26,7 +26,10 @@ class FunctionMapper {
 
   template<typename F, typename ...Args>
   void bindFunction(const std::string& name, F&& f) {
-    registFunction(name, std::forward<F>(f));
+    registFunction(name,
+                   std::forward<F>(f),
+                   helper::FuncTraits<F>::return_type_info,
+                   helper::FuncTraits<F>::arg_count_info);
   }
 
   void call(const std::string& name) {
@@ -89,7 +92,44 @@ class FunctionMapper {
 
  private:
   template<typename F>
-  void registFunction(const std::string& name, F f) {
+  void registFunction(const std::string& name,
+                      F f,
+                      helper::return_void const &,
+                      helper::arg_count_zero const &
+                     ) {
+    m_functionMap[name] = {
+      std::bind(&Invoker<F>::template noMember<helper::FuncTraits<decltype(f)>::arg_count>,
+                f,
+                std::placeholders::_1)
+    };
+
+  template<typename F>
+  void registFunction(const std::string& name, F f,
+                      helper::return_non_void const &,
+                      helper::arg_count_zero const &
+                     ) {
+    m_functionMap[name] = {
+      std::bind(&Invoker<F>::template noMember<helper::FuncTraits<decltype(f)>::arg_count>,
+                f,
+                std::placeholders::_1)
+    };
+
+  template<typename F>
+  void registFunction(const std::string& name, F f,
+                      helper::return_void,
+                      helper::arg_count_zero
+                     ) {
+    m_functionMap[name] = {
+      std::bind(&Invoker<F>::template noMember<helper::FuncTraits<decltype(f)>::arg_count>,
+                f,
+                std::placeholders::_1)
+    };
+
+  template<typename F>
+  void registFunction(const std::string& name, F f,
+                      helper::return_void,
+                      helper::arg_count_zero
+                     ) {
     m_functionMap[name] = {
       std::bind(&Invoker<F>::template noMember<helper::FuncTraits<decltype(f)>::arg_count>,
                 f,
@@ -97,6 +137,15 @@ class FunctionMapper {
     };
   }
 
+  template<typename F>
+  void registFunction(const std::string& name, F f) {
+    m_functionMap[name] = {
+      std::bind(&Invoker<F>::template noMember<helper::FuncTraits<decltype(f)>::arg_count>,
+                f,
+                std::placeholders::_1)
+    };
+  }
+  
  private:
   std::map<std::string, std::function<void(stream::Stream*)>> m_functionMap;
 };
