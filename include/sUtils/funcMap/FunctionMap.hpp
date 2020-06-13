@@ -25,11 +25,11 @@ class FunctionMapper {
   ~FunctionMapper() = default;
 
   template<typename F, typename ...Args>
-  void bindFunction(const std::string& name, F&& f) {
+  void bindFunction(const std::string& name, F f) {
     registFunction(name,
-                   std::forward<F>(f),
-                   helper::FuncTraits<F>::return_type_info,
-                   helper::FuncTraits<F>::arg_count_info);
+                   f,
+                   typename helper::FuncTraits<decltype(f)>::return_type_info(),
+                   typename helper::FuncTraits<decltype(f)>::arg_count_info());
   }
 
   void call(const std::string& name) {
@@ -73,7 +73,6 @@ class FunctionMapper {
  private:
   template<typename F>
   struct Invoker {
-    template<size_t N>
     static void noMember(F f, stream::Stream* s) {
       using traits = helper::FuncTraits<decltype(f)>;
       static_assert(traits::valid, "Invalid");
@@ -83,69 +82,45 @@ class FunctionMapper {
 
       helper::callMethod(f, std::move(parmasTuple));
     }
-
-    template<>
-    static void noMember<0>(F f, stream::Stream* s) {
-      helper::callMethod_noArg_impl(f);
-    }
   };
 
  private:
   template<typename F>
-  void registFunction(const std::string& name,
-                      F f,
-                      helper::return_void const &,
-                      helper::arg_count_zero const &
-                     ) {
-    m_functionMap[name] = {
-      std::bind(&Invoker<F>::template noMember<helper::FuncTraits<decltype(f)>::arg_count>,
-                f,
-                std::placeholders::_1)
-    };
-
-  template<typename F>
   void registFunction(const std::string& name, F f,
-                      helper::return_non_void const &,
-                      helper::arg_count_zero const &
-                     ) {
+                      typename helper::return_void const &,
+                      typename helper::arg_count_zero const &) {
     m_functionMap[name] = {
-      std::bind(&Invoker<F>::template noMember<helper::FuncTraits<decltype(f)>::arg_count>,
-                f,
-                std::placeholders::_1)
-    };
-
-  template<typename F>
-  void registFunction(const std::string& name, F f,
-                      helper::return_void,
-                      helper::arg_count_zero
-                     ) {
-    m_functionMap[name] = {
-      std::bind(&Invoker<F>::template noMember<helper::FuncTraits<decltype(f)>::arg_count>,
-                f,
-                std::placeholders::_1)
-    };
-
-  template<typename F>
-  void registFunction(const std::string& name, F f,
-                      helper::return_void,
-                      helper::arg_count_zero
-                     ) {
-    m_functionMap[name] = {
-      std::bind(&Invoker<F>::template noMember<helper::FuncTraits<decltype(f)>::arg_count>,
-                f,
-                std::placeholders::_1)
+      std::bind(&Invoker<F>::noMember, f, std::placeholders::_1)
     };
   }
 
   template<typename F>
-  void registFunction(const std::string& name, F f) {
+  void registFunction(const std::string& name, F f,
+                      typename helper::return_non_void const &,
+                      typename helper::arg_count_zero const &) {
     m_functionMap[name] = {
-      std::bind(&Invoker<F>::template noMember<helper::FuncTraits<decltype(f)>::arg_count>,
-                f,
-                std::placeholders::_1)
+      std::bind(&Invoker<F>::noMember, f, std::placeholders::_1)
     };
   }
-  
+
+  template<typename F>
+  void registFunction(const std::string& name, F f,
+                      typename helper::return_void const &,
+                      typename helper::arg_count_non_zero const &) {
+    m_functionMap[name] = {
+      std::bind(&Invoker<F>::noMember, f, std::placeholders::_1)
+    };
+  }
+
+  template<typename F>
+  void registFunction(const std::string& name, F f,
+                      typename helper::return_non_void const &,
+                      typename helper::arg_count_non_zero const &) {
+    m_functionMap[name] = {
+      std::bind(&Invoker<F>::noMember, f, std::placeholders::_1)
+    };
+  }
+
  private:
   std::map<std::string, std::function<void(stream::Stream*)>> m_functionMap;
 };

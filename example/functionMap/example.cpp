@@ -56,11 +56,11 @@ int main() {
   ////////////////
 
   sUtils::FunctionMapper fM;
-  fM.bindFunction("HelloWorld", &HelloWorld);
+  // fM.bindFunction("HelloWorld", &HelloWorld);
   // fM.bindFunction("printArg", &printArg);
   fM.bindFunction("sum", &sum);
 
-  fM.call("HelloWorld");
+  // fM.call("HelloWorld");
   // fM.call("printArg", "TEST");
   fM.call("sum", 1, 1);
 

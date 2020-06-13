@@ -16,7 +16,7 @@ namespace sUtils {
 namespace helper {
 
 /**
- * Function Parameter Traits
+ * Function Info Traits
  */
 
 struct return_void {};
@@ -24,23 +24,19 @@ struct return_non_void{};
 struct arg_count_zero{};
 struct arg_count_non_zero{};
 
-template<typename R>
-struct FunctReturnTrait {
+template<typename R> struct FunctReturnTrait {
   using type = return_non_void;
 };
 
-template<>
-struct FunctReturnTrait<void> {
+template<> struct FunctReturnTrait<void> {
   using type = return_void;
 };
 
-template<int n>
-struct FunctArgsTrait {
+template<int n> struct FunctArgsTrait {
   using type = arg_count_non_zero;
 };
 
-template<>
-struct FunctArgsTrait<0> {
+template<> struct FunctArgsTrait<0> {
   using type = arg_count_zero;
 };
 
