@@ -23,15 +23,6 @@ int sum(int a, int b) {
 }
 
 int main() {
-  // sUtils::FunctionMapper fM;
-  // fM.bindFunction("HelloWorld", &HelloWorld);
-  // fM.bindFunction("printArg", &printArg);
-  // fM.bindFunction("sum", sum);
-
-  // fM.call("HelloWorld");
-  // fM.call("printArg", "TEST");
-  // fM.call("sum", 1, 1);
-
   //  OK
   static_assert(ParamTraits<int>::valid == true, "Invalid");
   static_assert(ParamTraits<const int&>::valid == true, "Invalid");
@@ -65,12 +56,26 @@ int main() {
   Parameters<decltype(&printArg), 0>::serialize(s1, "Hello");
   ParamTraits<decltype(params1)>::read(s1, params1);
   std::cout << std::get<0>(params1) << std::endl;
+  callMethod(&printArg, std::move(params1));
 
   sUtils::stream::Stream s2;
   Parameters<decltype(&sum), 0>::serialize(s2, 1, 2);
   ParamTraits<decltype(params2)>::read(s2, params2);
   std::cout << std::get<0>(params2) << std::endl;
   std::cout << std::get<1>(params2) << std::endl;
+  auto res = callMethod(&sum, std::move(params2));
+  std::cout << res << std::endl;
+
+  ////////////////
+
+  sUtils::FunctionMapper fM;
+  fM.bindFunction("HelloWorld", &HelloWorld);
+  // fM.bindFunction("printArg", &printArg);
+  fM.bindFunction("sum", sum);
+
+  fM.call("HelloWorld");
+  // fM.call("printArg", "TEST");
+  fM.call("sum", 1, 1);
 
   return 0;
 }

@@ -19,14 +19,14 @@ namespace helper {
 
 //////////////////////////////////////////////////
 
-template <int... Is>
-struct index {};
+template <size_t... Is>
+struct seq {};
 
-template <int N, int... Is>
+template <size_t N, size_t... Is>
 struct gen_seq : gen_seq<N - 1, N - 1, Is...> {};
 
-template <int... Is>
-struct gen_seq<0, Is...> : index<Is...> {};
+template <size_t... Is>
+struct gen_seq<0, Is...> : seq<Is...> {};
 
 //////////////////////////////////////////////////
 // Type Traits
@@ -223,18 +223,18 @@ struct Tuple<T, true, N> {
 // Function Parameter Traits
 
 template <typename... T>
-struct ParamPack {
+struct ParamPackTraits {
   static constexpr bool valid = true;
 };
 
 template <typename First>
-struct ParamPack<First> {
+struct ParamPackTraits<First> {
   static constexpr bool valid = ParamTraits<First>::valid;
 };
 
 template <typename First, typename... Rest>
-struct ParamPack<First, Rest...> {
-  static constexpr bool valid = (ParamTraits<First>::valid && ParamPack<Rest...>::valid);
+struct ParamPackTraits<First, Rest...> {
+  static constexpr bool valid = (ParamTraits<First>::valid && ParamPackTraits<Rest...>::valid);
 };
 
 //////////////////////////////////////////////////
@@ -258,15 +258,11 @@ struct FuncTraits<R (C::*)(Args...) const> : public FuncTraits<R(Args...)> {
   using class_type = C;
 };
 
-// lambda fucntion
-template <typename T>
-struct FunctionTraits : public FunctionTraits<decltype(&T::operator())> {};
-
 template <typename R, typename... Args>
 struct FuncTraits<R(Args...)> {
   using return_type = R;
   static constexpr bool valid =
-      (ParamTraits<return_type>::valid && ParamPack<Args...>::valid);
+      (ParamTraits<return_type>::valid && ParamPackTraits<Args...>::valid);
 
   using param_tuple = std::tuple<typename ParamTraits<Args>::store_type...>;
   static constexpr std::size_t arity = sizeof...(Args);
@@ -278,11 +274,27 @@ struct FuncTraits<R(Args...)> {
   };
 };
 
+// lambda fucntion
+template <typename T>
+struct FunctionTraits : public FuncTraits<decltype(&T::operator())> {};
+
 //////////////////////////////////////////////////
 // serialize
 
+struct ParamPack {
+  template <typename S>
+  static void serialize(S&) {}
+
+  template <typename S, typename First, typename... Rest>
+  static void serialize(S& s, First&& first, Rest&&... rest) {
+    using Traits = ParamTraits<First>;
+    Traits::write(s, std::forward<First>(first));
+    ParamPack::serialize(s, std::forward<Rest>(rest)...);
+  }
+};
+
 template <typename F, int N>
-struct Parameters {
+struct Parameters : public ParamPack {
   template <typename S>
   static void serialize(S&) {}
 
@@ -301,9 +313,9 @@ template <typename... T>
 struct ParamTraits<std::tuple<T...>> {
   using tuple_type = std::tuple<T...>;
   using store_type = tuple_type;
-  static constexpr bool valid = ParamPack<T...>::valid;
+  static constexpr bool valid = ParamPackTraits<T...>::valid;
 
-  static_assert(ParamPack<T...>::valid == true,
+  static_assert(ParamPackTraits<T...>::valid == true,
               "One or more tuple elements are not of valid RPC parameter types.");
 
   template <typename S>
@@ -321,36 +333,45 @@ struct ParamTraits<std::tuple<T...>> {
 
 //////////////////////////////////////////////////
 
-// template <typename F>
-// struct FuncTraits {};
+template <typename F, typename Tuple, size_t... N>
+auto callMethod_impl(
+  F f,
+  Tuple&& t,
+  seq<N...>) -> typename FuncTraits<F>::return_type {
+    return f(ParamTraits<typename FuncTraits<F>::template argument<N>::type>::get(
+            std::get<N>(std::forward<Tuple>(t)))...);
+}
 
-// // method pointer
-// template <typename R, typename C, typename... Args>
-// struct FuncTraits<R (C::*)(Args...)> : public FuncTraits<R(Args...)> {
-//   using class_type = C;
-// };
+template <typename F, typename Tuple, size_t... N>
+auto callMethod_impl(
+  typename FuncTraits<F>::class_type& obj,
+  F f,
+  Tuple&& t,
+  seq<N...>) -> typename FuncTraits<F>::return_type {
+    return (obj.*f)(ParamTraits<typename FuncTraits<F>::template argument<N>::type>::get(
+            std::get<N>(std::forward<Tuple>(t)))...);
+}
 
-// // const method pointer
-// template <typename R, typename C, typename... Args>
-// struct FuncTraits<R (C::*)(Args...) const> : public FuncTraits<R(Args...)> {
-//   using class_type = C;
-// };
+template <typename F, typename Tuple>
+auto callMethod(F f, Tuple&& t) -> typename FuncTraits<F>::return_type {
+  static_assert(FuncTraits<F>::valid, "Function not usable as RPC");
 
-// template <typename R, typename... Args>
-// struct FuncTraits<R(Args...)> {
-//   using return_type = R; static constexpr bool valid =
-//     ParamTraits<return_type>::valid && ParamPack<Args...>::valid;
+  return callMethod_impl(f,
+                         std::forward<Tuple>(t),
+                         gen_seq<FuncTraits<F>::arity>());
+}
 
-//   using param_tuple = std::tuple<typename ParamTraits<Args>::store_type...>;
+template <typename F, typename Tuple>
+auto callMethod(typename FunctionTraits<F>::class_type& obj,
+                F f,
+                Tuple&& t) -> typename FuncTraits<F>::return_type {
+  static_assert(FunctionTraits<F>::valid, "Function not usable as RPC");
 
-//   static constexpr std::size_t arity = sizeof...(Args);
-
-//   template <std::size_t N>
-//   struct argument {
-//     static_assert(N < arity, "error: invalid parameter index.");
-//     using type = typename std::tuple_element<N, std::tuple<Args...>>::type;
-//   };
-// };
+  return callMethod_impl(obj,
+                         f,
+                         std::forward<Tuple>(t),
+                         gen_seq<FuncTraits<F>::arity>());
+}
 
 //////////////////////////////////////////////////
 

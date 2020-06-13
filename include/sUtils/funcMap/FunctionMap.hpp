@@ -19,60 +19,62 @@
 
 namespace sUtils {
 
-// class Action {
-//  public:
-//     template <typename F>
-//     explicit Action(F&& func) : f(std::forward<F>(func)) {}
+class FunctionMapper {
+ public:
+  FunctionMapper() = default;
+  ~FunctionMapper() = default;
 
-//     template <typename... Args, int... Is>
-//     void func(std::tuple<Args...>& tup, helper::index<Is...>) {
-//         f(std::get<Is>(tup)...);
-//     }
+  template<typename F, typename ...Args>
+  void bindFunction(const std::string& name, F&& f) {
+    registFunction(name, std::forward<F>(f));
+  }
 
-//     template <typename... Args>
-//     void func(const std::tuple<Args...>& tup) {
-//         func(tup, helper::gen_seq<sizeof...(Args)>{});
-//     }
+  template<typename Arg, typename ...Args>
+  void call(const std::string& name, stream::Stream& serial, Arg&& arg) {
+    helper::ParamPack::serialize(serial, arg);
 
-//     template<typename... Args>
-//     void act(Args&&... args) {
-//         std::tuple<Args...> params(std::forward<Args>(args)...);
+    m_functionMap[name](serial);
+  }
 
-//         func(params);
-//     }
-// };
+  template<typename Arg, typename ...Args>
+  void call(const std::string& name, stream::Stream& serial, Arg&& arg, Args&& ...args) {
+    helper::ParamPack::serialize(serial, arg);
 
-// template <typename F>
-// Action make_action(F&& f) {
-//     return Action (std::forward<F>(f));
-// }
+    call(name, serial, args...);
+  }
 
-// class FunctionMapper {
-//  public:
-//   FunctionMapper() = default;
-//   ~FunctionMapper() = default;
+  template<typename Arg, typename ...Args>
+  void call(const std::string& name, Arg&& arg, Args&& ...args) {
+    stream::Stream serial;
+    helper::ParamPack::serialize(serial, arg);
 
-//   template<typename F, typename ...Args>
-//   void bindFunction(const std::string& name, F&& f) {
-//     registFunction(name, std::forward<F>(f));
-//   }
+    call(name, serial, args...);
+  }
 
-//   template<typename ...Args>
-//   void call(const std::string& name, Args&& ...args) {
-//     m_functionMap[name](std::forward<Args...>(args...));
-//   }
+ private:
+  template<typename F>
+  struct Invoker {
+    static void noMember(F f, stream::Stream s) {
+      using traits = helper::FuncTraits<decltype(f)>;
+      static_assert(traits::valid, "Invalid");
+      typename traits::param_tuple parmasTuple;
+      helper::ParamTraits<decltype(parmasTuple)>::read(s, parmasTuple);
 
-//  private:
-//   template<typename F, typename ...Args>
-//   void registFunction(const std::string& name, F&& f) {
-//     m_functionMap[name] = std::forward<F>(f);
-//   }
+      helper::callMethod(f, std::move(parmasTuple));
+    }
+  };
 
-//  private:
-//   std::map<std::string, std::function<void()>> m_functionMap;
-// };
+ private:
+  template<typename F>
+  void registFunction(const std::string& name, F f) {
+    m_functionMap[name] = {
+      std::bind(&Invoker<F>::noMember, f, std::placeholders::_1)
+    };
+  }
 
-// Check if a function signature "R(A)" only uses arithmetic types
+ private:
+  std::map<std::string, std::function<void(stream::Stream)>> m_functionMap;
+};
 
 }  // namespace sUtils
 

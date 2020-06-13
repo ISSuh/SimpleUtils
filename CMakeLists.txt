@@ -6,7 +6,7 @@ PROJECT (SimpleUtils)
 #-------------------------------------------------------------------------------
 SET( CMAKE_CXX_STANDARD 11)
 SET( CMAKE_CXX_STANDARD_REQUIRED ON )
-ADD_COMPILE_OPTIONS ( -g -Wall -Wextra)
+ADD_COMPILE_OPTIONS ( -g -Wall -Wextra )
 
 #-------------------------------------------------------------------------------
 # Set Configure
