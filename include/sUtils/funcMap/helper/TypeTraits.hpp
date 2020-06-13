@@ -17,19 +17,23 @@
 namespace sUtils {
 namespace helper {
 
-// Type Traits
+/**
+ * Type Traits
+ */
 
-// By default all types are invalid
 template <typename T, typename ENABLE = void>
 struct TypeTraits {
   static constexpr bool valid = false;
-  using store_type = int;
+  using store_type = T;
 };
 
-template <>
-struct TypeTraits<void> {
-    static constexpr bool valid = true;
-	using store_type = void;
+// Support for void type
+template <typename T>
+struct TypeTraits<T,
+                   typename std::enable_if<std::is_void<T>::value>::type
+                  > {
+  static constexpr bool valid = true;
+  using store_type = T;
 };
 
 // Support for any arithmetic type
@@ -49,33 +53,38 @@ struct TypeTraits<T,
   static store_type get(store_type v) { return v; }
 };
 
-// Generic support for const T&, for any valid T
+// Generic support for T&, for any valid T
 template <typename T> struct TypeTraits<T&> : TypeTraits<T> {
-  static_assert(TypeTraits<T>::valid, "Invalid RPC parameter type");
+  static_assert(TypeTraits<T>::valid, "T& - Unsupported Type");
 };
 
+// Generic support for const T&, for any valid T
 template <typename T> struct TypeTraits<const T&> : TypeTraits<T> {
-  static_assert(TypeTraits<T>::valid, "Invalid RPC parameter type");
+  static_assert(TypeTraits<T>::valid, "const T& - Unsupported Type");
 };
 
+// Generic support for T*, for any valid T
 template <typename T> struct TypeTraits<T*> : TypeTraits<T> {
-  static_assert(TypeTraits<T>::valid, "Invalid RPC parameter type");
+  static_assert(TypeTraits<T>::valid, "T* - Unsupported Type");
 };
 
+// Generic support for const const T*, for any valid T
 template <typename T>
 struct TypeTraits<const T*> : TypeTraits<T> {
-  static_assert(TypeTraits<T>::valid, "Invalid RPC parameter type");
+  static_assert(TypeTraits<T>::valid, "const T* - Unsupported Type");
 };
 
+// Generic support for const T* const, for any valid T
 template <typename T> struct TypeTraits<T* const> : TypeTraits<T> {
-  static_assert(TypeTraits<T>::valid, "Invalid RPC parameter type");
+  static_assert(TypeTraits<T>::valid, "T* const - Unsupported Type");
 };
 
 template <typename T>
 struct TypeTraits<std::vector<T>> {
   using store_type = std::vector<T>;
   static constexpr bool valid = TypeTraits<T>::valid;
-  static_assert(TypeTraits<T>::valid == true, "T is not valid RPC parameter type.");
+
+  static_assert(TypeTraits<T>::valid, "vector<T> - Unsupported Type");
 
   // Write the vector size, followed by  each element
   template <typename S>
@@ -151,12 +160,18 @@ struct TypeTraits<const char*> {
 };
 
 template <int N>
-struct TypeTraits<char[N]> : TypeTraits<const char*> {};
+struct TypeTraits<char[N]> : TypeTraits<const char*> {
+  static_assert(TypeTraits<char*>::valid, "char[N] -  Unsupported Type");
+};
 template <int N>
-struct TypeTraits<const char[N]> : TypeTraits<const char*> {};
-template <int N>
-struct TypeTraits<const char (&)[N]> : TypeTraits<const char*> {};
+struct TypeTraits<const char[N]> : TypeTraits<const char*> {
+  static_assert(TypeTraits<char*>::valid, "const char[N] -  Unsupported Type");
+};
 
+template <int N>
+struct TypeTraits<const char (&)[N]> : TypeTraits<const char*> {
+  static_assert(TypeTraits<char*>::valid, "char (&)[N] -  Unsupported Type");
+};
 
 template <>
 struct TypeTraits<std::string> : TypeTraits<const char*> {

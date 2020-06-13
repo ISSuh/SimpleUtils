@@ -12,7 +12,7 @@
 #include <vector>
 #include <utility>
 
-#include "Helper.hpp"
+#include "helper/Helper.hpp"
 
 namespace sUtils {
 namespace stream {
@@ -63,13 +63,13 @@ class Stream {
 
 template <typename T>
 Stream& operator<<(Stream& s, const T& v) {
-  helper::ParamTraits<T>::write(s, v);
+  helper::TypeTraits<T>::write(s, v);
   return s;
 }
 
 template <typename T>
 Stream& operator>>(Stream& s, T& v) {
-  helper::ParamTraits<T>::read(s, v);
+  helper::TypeTraits<T>::read(s, v);
   return s;
 }
 

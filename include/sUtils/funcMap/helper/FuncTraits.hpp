@@ -64,11 +64,11 @@ struct FuncTraits<R(Args...)> {
       (TypeTraits<return_type>::valid && ParamPackTraits<Args...>::valid);
 
   using param_tuple = std::tuple<typename TypeTraits<Args>::store_type...>;
-  static constexpr std::size_t arity = sizeof...(Args);
+  static constexpr std::size_t arg_count = sizeof...(Args);
 
   template <std::size_t N>
   struct argument {
-    static_assert(N < arity, "error: invalid parameter index.");
+    static_assert(N < arg_count, "error: invalid parameter index.");
 
     using type = typename std::tuple_element<N, std::tuple<Args...>>::type;
   };

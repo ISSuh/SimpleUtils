@@ -29,11 +29,27 @@ class FunctionMapper {
     registFunction(name, std::forward<F>(f));
   }
 
+  void call(const std::string& name) {
+    m_functionMap[name](nullptr);
+  }
+
+  void call(const std::string& name, stream::Stream& serial) {
+    m_functionMap[name](&serial);
+  }
+
+  template<typename Arg>
+  void call(const std::string& name, Arg&& arg) {
+    stream::Stream serial;
+    helper::ParamPack::serialize(serial, arg);
+
+    call(name, serial);
+  }
+
   template<typename Arg, typename ...Args>
   void call(const std::string& name, stream::Stream& serial, Arg&& arg) {
     helper::ParamPack::serialize(serial, arg);
 
-    m_functionMap[name](serial);
+    m_functionMap[name](&serial);
   }
 
   template<typename Arg, typename ...Args>
@@ -54,13 +70,20 @@ class FunctionMapper {
  private:
   template<typename F>
   struct Invoker {
-    static void noMember(F f, stream::Stream s) {
+    template<size_t N>
+    static void noMember(F f, stream::Stream* s) {
       using traits = helper::FuncTraits<decltype(f)>;
       static_assert(traits::valid, "Invalid");
+
       typename traits::param_tuple parmasTuple;
-      helper::ParamTraits<decltype(parmasTuple)>::read(s, parmasTuple);
+      helper::TypeTraits<decltype(parmasTuple)>::read(*s, parmasTuple);
 
       helper::callMethod(f, std::move(parmasTuple));
+    }
+
+    template<>
+    static void noMember<0>(F f, stream::Stream* s) {
+      helper::callMethod_noArg_impl(f);
     }
   };
 
@@ -68,12 +91,14 @@ class FunctionMapper {
   template<typename F>
   void registFunction(const std::string& name, F f) {
     m_functionMap[name] = {
-      std::bind(&Invoker<F>::noMember, f, std::placeholders::_1)
+      std::bind(&Invoker<F>::template noMember<helper::FuncTraits<decltype(f)>::arg_count>,
+                f,
+                std::placeholders::_1)
     };
   }
 
  private:
-  std::map<std::string, std::function<void(stream::Stream)>> m_functionMap;
+  std::map<std::string, std::function<void(stream::Stream*)>> m_functionMap;
 };
 
 }  // namespace sUtils
