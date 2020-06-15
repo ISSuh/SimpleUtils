@@ -8,5 +8,6 @@
 #define SUTILS_HPP_
 
 #include "sUtils/funcMap/FunctionMap.hpp"
+#include "sUtils/funcMap/Serialize.hpp"
 
 #endif  // SUTILS_HPP_

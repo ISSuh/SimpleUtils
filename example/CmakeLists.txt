@@ -4,6 +4,7 @@ message("SimpleUtils Examples")
 
 SET ( SUBDIRS
     functionMap
+    serialize
 )
 
 foreach(SUBDIR ${SUBDIRS})
