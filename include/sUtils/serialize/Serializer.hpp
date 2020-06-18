@@ -18,13 +18,13 @@ class Serializer {
   ~Serializer() = default;
 
   template <typename Type>
-  void serialize(Type data, int size);
+  static void serialize(Type data);
 
   template <typename Type>
-  void deserialize(Type data, int size);
+  static void serialize(Type* data, int size);
 
- private:
-  buffer::Buffer m_buffer;
+  template <typename Type>
+  static void deserialize(Type data, int size);
 };
 
 }  // namespace sUtils
