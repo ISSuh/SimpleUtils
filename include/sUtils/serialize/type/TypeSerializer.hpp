@@ -15,29 +15,38 @@ namespace type {
 
 template<typename T>
 class TypeSerializer {
-  template <typename Type>
-  static void serialize(Type data) {
+  static void serialize(T data) {
     m_buf.write(data);
   }
 
-  template <typename Type>
-  static void serialize(Type* data) {
+  static void serialize(T* data) {
     m_buf.write(*data);
   }
 
-  template <typename Type>
-  static void serialize(Type& data) {
+  static void serialize(T& data) {
     m_buf.write(data);
   }
 
-  template <typename Type>
-  static void deserialize(Type& data) {
+  static void deserialize(T& data) {
     m_buf.read(data);
+  }
+
+  TypeSerializer& operator<<(const T& rhs) {
+    serialize(rhs);
+    return *this;
+  }
+
+  TypeSerializer& operator>>(const T& rhs) {
+    deserialize(rhs);
+    return *this;
   }
 
  private:
   helper::Buffer m_buf;
 };
+
+template<typename T>
+
 
 }  // namespace type
 }  // namespace sUtils
