@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <vector>
 #include <functional>
 #include <utility>
@@ -114,7 +115,7 @@ struct TypeTraits<std::vector<T>> {
 struct StringTraits {
   template <typename S>
   static void write(S& s, const char* v) {
-    int len = static_cast<int>(strlen(v));
+    int len = static_cast<int>(std::strlen(v));
     s.write(&len, sizeof(len));
     s.write(v, len);
   }

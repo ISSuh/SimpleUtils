@@ -1,23 +1,25 @@
-project(functionMap)
+project(FunctionMap)
 
 message("SimpleUtils FunctionMap Examples")
 
-include_directories(
-     ${SRPC_INCLUDES}
-)
-
 #-------------------------------------------------------------------------------
-# Project files
+# Set Include Dir
 #-------------------------------------------------------------------------------
-SET( SOURCES
-    example.cpp
+set( EXAMPLE_SRC
+  funcionMap
 )
 
 #-------------------------------------------------------------------------------
 # Final target
 #-------------------------------------------------------------------------------
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY  ${BUILD_DIR_EXAMPLES} )
+foreach(EXAMPLE_NAME ${EXAMPLE_SRC})
 
-add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} ${SRPC_LIBRARY} )
-set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "example")
+  add_executable( ${EXAMPLE_NAME} ${EXAMPLE_NAME}.cpp )
+
+  target_include_directories( ${EXAMPLE_NAME}
+  PUBLIC
+    ${SUTIL_INCLUDES}
+  )
+
+  set_property(TARGET ${EXAMPLE_NAME} PROPERTY FOLDER "example")
+endforeach()

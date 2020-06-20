@@ -1,0 +1,31 @@
+PROJECT (SerializeUnitTests)
+
+#-------------------------------------------------------------------------------
+# Set Test
+#-------------------------------------------------------------------------------
+SET ( TEST_SOURCES
+  serialize_type_test
+)
+
+#-------------------------------------------------------------------------------
+# Final target
+#-------------------------------------------------------------------------------
+foreach(TEST_NAME ${TEST_SOURCES})
+
+  add_executable( ${TEST_NAME} ${TEST_NAME}.cpp )
+
+  target_include_directories( ${TEST_NAME}
+  PUBLIC
+    ${SUTIL_INCLUDES}
+  )
+
+  target_link_libraries( ${TEST_NAME} gtest gtest_main )
+
+  add_test(
+      NAME
+        ${TEST_NAME}
+      COMMAND
+        ${TEST_NAME}
+)
+
+endforeach()

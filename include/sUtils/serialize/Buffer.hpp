@@ -36,7 +36,9 @@ class Buffer {
   void read(T* dst) {
     size_t size = sizeof(*dst);
 
-    assert(m_head + size <= static_cast<uint32_t>(m_buf.size()));
+    if (m_head + size > static_cast<uint32_t>(m_buf.size())) {
+      throw "Out of Range";
+    }
 
     std::copy(&m_buf[m_head], &m_buf[m_head] + size,
               reinterpret_cast<char*>(dst));
@@ -49,7 +51,7 @@ class Buffer {
   }
 
   const std::string& toString() {
-    return std::string(m_buf.begin(), m_buf.end());
+    return std::move(std::string(m_buf.begin(), m_buf.end()));
   }
 
   void fromString(const std::string& serializedValue) {
