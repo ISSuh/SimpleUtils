@@ -7,46 +7,22 @@
 #ifndef SUTILS_SERIALIZE_TYPE_TYPESERIALIZER_HPP_
 #define SUTILS_SERIALIZE_TYPE_TYPESERIALIZER_HPP_
 
-#include "type/Type.hpp"
-#include "helper/Buffer.hpp"
+#include "Type.hpp"
 
 namespace sUtils {
 namespace type {
 
-template<typename T>
+template<typename T, typename B, typename ENABLE = void>
 class TypeSerializer {
-  static void serialize(T data) {
-    m_buf.write(data);
+ public:
+  static void serialize(const T& data, B& buf) {
+    buf.write(data);
   }
 
-  static void serialize(T* data) {
-    m_buf.write(*data);
+  static void deserialize(T& dst, B& buf) {
+    buf.read(&dst);
   }
-
-  static void serialize(T& data) {
-    m_buf.write(data);
-  }
-
-  static void deserialize(T& data) {
-    m_buf.read(data);
-  }
-
-  TypeSerializer& operator<<(const T& rhs) {
-    serialize(rhs);
-    return *this;
-  }
-
-  TypeSerializer& operator>>(const T& rhs) {
-    deserialize(rhs);
-    return *this;
-  }
-
- private:
-  helper::Buffer m_buf;
 };
-
-template<typename T>
-
 
 }  // namespace type
 }  // namespace sUtils

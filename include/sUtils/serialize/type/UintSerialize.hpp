@@ -23,20 +23,23 @@ struct TypeTraits<T,
                                           std::is_unsigned<T>::value
                                          >::type> {
   static constexpr bool valid = true;
-  using Type = T;
-
-  template<typename S>
-  static void serialize(S& serializer, T val) { serializer.serialize(v); }
-
-  template<typename S>
-  static void deserialize(S& serializer, T val) { serializer.deserialize(v); }
+  using type = T;
 };
 
 }  // namespace helper
 
-template<>
-class Serializer {
+template<typename T, typename B>
+class TypeSerializer<T, B,
+                     typename std::enable_if<helper::TypeTraits<T>::valid>::type
+                    > {
+ public:
+  static void serialize(const T& data, B& buf) {
+    buf.write(data);
+  }
 
+  static void deserialize(T& dst, B& buf) {
+    buf.read(&dst);
+  }
 };
 
 }  // namespace type

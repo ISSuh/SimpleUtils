@@ -7,8 +7,10 @@
 #ifndef SUTILS_SERIALIZE_SERIALIZER_HPP_
 #define SUTILS_SERIALIZE_SERIALIZER_HPP_
 
-#include "type/Type.hpp"
-#include "buffer/Buffer.hpp"
+#include <string>
+
+#include "Buffer.hpp"
+#include "type/TypeSerializer.hpp"
 
 namespace sUtils {
 
@@ -17,14 +19,22 @@ class Serializer {
   Serializer() = default;
   ~Serializer() = default;
 
-  template <typename Type>
-  static void serialize(Type data);
+  template <typename T>
+  void serialize(T data) {
+    type::TypeSerializer<T, Buffer>::serialize(data, m_buf);
+  }
 
-  template <typename Type>
-  static void serialize(Type* data, int size);
+  template <typename T>
+  void deserialize(T& data) {
+    type::TypeSerializer<T, Buffer>::deserialize(data, m_buf);
+  }
 
-  template <typename Type>
-  static void deserialize(Type data, int size);
+  const std::string& getSerialized() {
+    return m_buf.toString();
+  }
+
+ private:
+  Buffer m_buf;
 };
 
 }  // namespace sUtils
