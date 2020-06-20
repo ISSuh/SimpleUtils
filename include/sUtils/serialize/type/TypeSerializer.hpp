@@ -15,7 +15,7 @@ namespace type {
 template<typename T, typename B, typename ENABLE = void>
 class TypeSerializer {
  public:
-  static void serialize(const T& data, B& buf) {
+  static void serialize(T& data, B& buf) {
     buf.write(data);
   }
 

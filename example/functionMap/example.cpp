@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include <sUtils.hpp>
+#include <sUtils/funcMap/FunctionMap.hpp>
 
 using namespace sUtils::helper;
 

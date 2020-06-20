@@ -33,7 +33,7 @@ class TypeSerializer<T, B,
                      typename std::enable_if<helper::TypeTraits<T>::valid>::type
                     > {
  public:
-  static void serialize(const T& data, B& buf) {
+  static void serialize(T& data, B& buf) {
     buf.write(data);
   }
 

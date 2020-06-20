@@ -10,30 +10,36 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <utility>
 
-#include "type/TypeSerializer.hpp"
+#include "type/Type.hpp"
 
 namespace sUtils {
 
 class Buffer {
  public:
   Buffer() : m_head(0) {}
-  explicit Buffer(size_t size) : m_buf(std::vector<uint8_t>(size)), m_head(0) {}
+  explicit Buffer(size_t size) : m_buf(std::vector<char>(size)), m_head(0) {}
   ~Buffer() {
     clear();
   }
 
   template<typename T>
-  void write(const T& value) {
+  void write(T& value) {
     size_t size = sizeof(value);
-    m_buf.insert(m_buf.end(), size, value);
+
+    const char* p = reinterpret_cast<char*>(&value);
+    std::copy(p, p + size, std::back_inserter(m_buf));
   }
 
   template<typename T>
-  void read(void* dst) {
-    size_t size = sizeof(dst);
+  void read(T* dst) {
+    size_t size = sizeof(*dst);
 
-    std::copy(m_buf[m_head], m_buf[m_head + size], dst);
+    assert(m_head + size <= static_cast<uint32_t>(m_buf.size()));
+
+    std::copy(&m_buf[m_head], &m_buf[m_head] + size,
+              reinterpret_cast<char*>(dst));
     m_head += size;
   }
 
@@ -62,7 +68,7 @@ class Buffer {
   }
 
  private:
-  std::vector<uint8_t> m_buf;
+  std::vector<char> m_buf;
   uint32_t m_head;
 };
 

@@ -6,23 +6,28 @@
 
 #include <iostream>
 
-#include <sUtils.hpp>
+#include <sUtils/serialize/Serializer.hpp>
 
 int main() {
-  uint8_t a = 1;
-  uint16_t b = 1;
-  uint32_t c = 1;
-  uint64_t d = 1;
+  uint32_t a = 10;
+  uint32_t b = 20;
+  uint32_t aa;
+  uint32_t bb;
+
+  std::cout << "Before\n";
+  std::cout << "A : " << std::showbase << std::hex << a << std::endl;
+  std::cout << "B : " << std::showbase << std::hex << b << std::endl;
 
   sUtils::Serializer serializer;
-
   serializer.serialize(a);
+  serializer.serialize(b);
 
-  a = 0;
+  serializer.deserialize(aa);
+  serializer.deserialize(bb);
 
-  serializer.deserialize(a);
-
-  std::cout << a << std::endl;
+  std::cout << "Deserialize\n";
+  std::cout << "A : " << std::showbase << std::hex << aa << std::endl;
+  std::cout << "B : " << std::showbase << std::hex << bb << std::endl;
 
   return 0;
 }

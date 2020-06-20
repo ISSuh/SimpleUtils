@@ -1,6 +1,6 @@
-project(serialize)
+project(functionMap)
 
-message("SimpleUtils Serialize Examples")
+message("SimpleUtils FunctionMap Examples")
 
 include_directories(
      ${SRPC_INCLUDES}
