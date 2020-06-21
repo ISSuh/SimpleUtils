@@ -18,20 +18,18 @@ namespace type {
 namespace helper {
 
 template <typename T>
-struct TypeTraits<T,
-                  typename std::enable_if<std::is_arithmetic<T>::value &&
-                                          std::is_unsigned<T>::value
-                                         >::type> {
+struct TypeTraits<T, typename std::enable_if<std::is_unsigned<T>::value, void>::type> {
   static constexpr bool valid = true;
   using type = T;
 };
 
+template <typename T>
+struct UintTraits : public TypeTraits<T> {};
+
 }  // namespace helper
 
 template<typename T, typename B>
-class TypeSerializer<T, B,
-                     typename std::enable_if<helper::TypeTraits<T>::valid>::type
-                    > {
+class TypeSerializer<T, B, typename helper::UintTraits<T>::type> {
  public:
   static void serialize(T& data, B& buf) {
     buf.write(data);

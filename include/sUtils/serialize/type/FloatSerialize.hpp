@@ -7,8 +7,39 @@
 #ifndef SUTILS_SERIALIZE_TYPE_FLOATSERIALIZE_HPP_
 #define SUTILS_SERIALIZE_TYPE_FLOATSERIALIZE_HPP_
 
+#include <type_traits>
+
+#include "helper/TypeTrait.hpp"
+#include "TypeSerializer.hpp"
+
 namespace sUtils {
 namespace type {
+
+namespace helper {
+
+template <typename T>
+struct TypeTraits<T, typename std::enable_if<std::is_floating_point<T>::value, void>::type> {
+  static constexpr bool valid = true;
+  using type = T;
+};
+
+template <typename T> struct FloatTraits : public TypeTraits<T> {
+  static_assert(TypeTraits<T>::valid, "T& - Unsupported Type");
+};
+
+}  // namespace helper
+
+template<typename T, typename B>
+class TypeSerializer<T, B, typename helper::FloatTraits<T>::type> {
+ public:
+  static void serialize(T& data, B& buf) {
+    buf.write(data);
+  }
+
+  static void deserialize(T& dst, B& buf) {
+    buf.read(&dst);
+  }
+};
 
 }  // namespace type
 }  // namespace sUtils

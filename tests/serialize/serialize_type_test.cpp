@@ -36,6 +36,24 @@ TEST(Serialize, Uint) {
   ASSERT_EQ(serializeUINT64, deserializeUINT64);
 }
 
+TEST(Serialize, Float) {
+  float serializeFLOAT = 4.4;
+  double serializeDOUBLE = 8.8;
+  float deserializeFLOAT = 0;
+  double deserializeDOUBLE = 0;
+
+  sUtils::Serializer serializer;
+  serializer.serialize(serializeFLOAT);
+  serializer.serialize(serializeDOUBLE);
+
+  serializer.deserialize(deserializeFLOAT);
+  serializer.deserialize(deserializeDOUBLE);
+
+  ASSERT_EQ(serializeFLOAT, deserializeFLOAT);
+  ASSERT_EQ(serializeDOUBLE, deserializeDOUBLE);
+}
+
+
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

@@ -8,7 +8,6 @@
 #define SUTILS_SERIALIZE_TYPE_TYPE_HPP_
 
 #include "CharSerialize.hpp"
-#include "DoubleSerialize.hpp"
 #include "FloatSerialize.hpp"
 #include "IntSerialize.hpp"
 #include "StringSerialize.hpp"
