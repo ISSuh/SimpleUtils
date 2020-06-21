@@ -18,13 +18,15 @@ namespace type {
 namespace helper {
 
 template <typename T>
-struct TypeTraits<T, typename std::enable_if<std::is_unsigned<T>::value, void>::type> {
+struct TypeTraits<T, typename std::enable_if<(std::is_unsigned<T>::value &&
+                                              std::is_integral<T>::value), void>::type> {
   static constexpr bool valid = true;
   using type = T;
 };
 
-template <typename T>
-struct UintTraits : public TypeTraits<T> {};
+template <typename T> struct UintTraits : public TypeTraits<T> {
+  static_assert(TypeTraits<T>::valid, "T - Unsupported Type");
+};
 
 }  // namespace helper
 
