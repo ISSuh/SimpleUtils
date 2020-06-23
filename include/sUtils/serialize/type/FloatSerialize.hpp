@@ -24,7 +24,27 @@ struct TypeTraits<T, typename std::enable_if<std::is_floating_point<T>::value, v
 };
 
 template <typename T> struct FloatTraits : public TypeTraits<T> {
-  static_assert(TypeTraits<T>::valid, "T& - Unsupported Type");
+  static_assert(TypeTraits<T>::valid, "T - Unsupported Type");
+};
+
+template <typename T> struct FloatTraits<T*> : public FloatTraits<T> {
+  static_assert(FloatTraits<T>::valid, "T* - Unsupported Type");
+};
+
+template <typename T> struct FloatTraits<const T*> : public FloatTraits<T> {
+  static_assert(FloatTraits<T>::valid, "const T* - Unsupported Type");
+};
+
+template <typename T> struct FloatTraits<T&> : public FloatTraits<T> {
+  static_assert(FloatTraits<T>::valid, "T& - Unsupported Type");
+};
+
+template <typename T> struct FloatTraits<const T&> : public FloatTraits<T> {
+  static_assert(FloatTraits<T>::valid, "const T& - Unsupported Type");
+};
+
+template <typename T, std::size_t N> struct FloatTraits<T[N]> : public FloatTraits<T> {
+  static_assert(FloatTraits<T>::valid, "T[N] - Unsupported Type");
 };
 
 }  // namespace helper

@@ -37,6 +37,22 @@ TEST(Serialize, UINT) {
   ASSERT_EQ(serializeUINT64, deserializeUINT64);
 }
 
+TEST(Serialize, UINT_ARRAY) {
+  sUtils::Serializer serializer;
+
+  uint32_t serializeUINT32_Arr[5] = {1, 2, 3, 4, 5};
+
+  uint32_t deserializeUINT32_Arr[5] = {0, 0, 0, 0, 0};
+
+  serializer.serialize(serializeUINT32_Arr);
+
+  serializer.deserialize(deserializeUINT32_Arr);
+
+  for (auto i = 0 ; i < 5 ; ++i) {
+    ASSERT_EQ(serializeUINT32_Arr[i], deserializeUINT32_Arr[i]);
+  }
+}
+
 TEST(Serialize, INT) {
   sUtils::Serializer serializer;
 

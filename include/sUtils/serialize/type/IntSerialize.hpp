@@ -28,6 +28,26 @@ template <typename T> struct IntTraits : public TypeTraits<T> {
   static_assert(TypeTraits<T>::valid, "T - Unsupported Type");
 };
 
+template <typename T> struct IntTraits<T*> : public IntTraits<T> {
+  static_assert(IntTraits<T>::valid, "T* - Unsupported Type");
+};
+
+template <typename T> struct IntTraits<const T*> : public IntTraits<T> {
+  static_assert(IntTraits<T>::valid, "const T* - Unsupported Type");
+};
+
+template <typename T> struct IntTraits<T&> : public IntTraits<T> {
+  static_assert(IntTraits<T>::valid, "T& - Unsupported Type");
+};
+
+template <typename T> struct IntTraits<const T&> : public IntTraits<T> {
+  static_assert(IntTraits<T>::valid, "const T& - Unsupported Type");
+};
+
+template <typename T, std::size_t N> struct IntTraits<T[N]> : public IntTraits<T> {
+  static_assert(IntTraits<T>::valid, "T[N] - Unsupported Type");
+};
+
 }  // namespace helper
 
 template<typename T, typename B>

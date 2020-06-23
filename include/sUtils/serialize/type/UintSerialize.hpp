@@ -18,16 +18,14 @@ namespace type {
 namespace helper {
 
 template <typename T>
-struct TypeTraits<T, typename std::enable_if<(std::is_unsigned<T>::value &&
-                                              std::is_integral<T>::value), void>::type> {
+struct TypeTraits<T, typename std::enable_if<(std::is_unsigned<T>::value), void>::type> {
   static constexpr bool valid = true;
   using type = T;
 };
 
 template <typename T>
 struct TypeTraits<T, typename std::enable_if<(std::is_array<T>::value &&
-                                              std::is_unsigned<T>::value &&
-                                              std::is_integral<T>::value), void>::type> {
+                                              std::is_unsigned<T>::value), void>::type> {
   static constexpr bool valid = true;
   using type = T;
 };
@@ -36,13 +34,35 @@ template <typename T> struct UintTraits : public TypeTraits<T> {
   static_assert(TypeTraits<T>::valid, "T - Unsupported Type");
 };
 
+template <typename T> struct UintTraits<T*> : public UintTraits<T> {
+  static_assert(UintTraits<T>::valid, "T* - Unsupported Type");
+};
+
+template <typename T> struct UintTraits<const T*> : public UintTraits<T> {
+  static_assert(UintTraits<T>::valid, "const T* - Unsupported Type");
+};
+
+template <typename T> struct UintTraits<T&> : public UintTraits<T> {
+  static_assert(UintTraits<T>::valid, "T& - Unsupported Type");
+};
+
+template <typename T> struct UintTraits<const T&> : public UintTraits<T> {
+  static_assert(UintTraits<T>::valid, "const T& - Unsupported Type");
+};
+
+template <typename T, std::size_t N> struct UintTraits<T[N]> : public UintTraits<T> {
+  static_assert(UintTraits<T>::valid, "T[N] - Unsupported Type");
+};
+
 }  // namespace helper
 
 template<typename T, typename B>
 class TypeSerializer<T, B, typename helper::UintTraits<T>::type> {
  public:
   static void serialize(T& data, B& buf) {
-    buf.write(data);
+    size_t len = (sizeof(data) / sizeof(data[0]));
+
+    buf.write(data, len);
   }
 
   static void serialize(const T* data, B& buf) {
