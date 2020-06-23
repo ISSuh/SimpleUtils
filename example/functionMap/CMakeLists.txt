@@ -5,6 +5,8 @@ message("SimpleUtils FunctionMap Examples")
 #-------------------------------------------------------------------------------
 # Set Include Dir
 #-------------------------------------------------------------------------------
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  ${BUILD_DIR_EXAMPLES} )
+
 set( EXAMPLE_SRC
   funcionMap
 )

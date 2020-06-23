@@ -45,7 +45,6 @@ TEST(Serialize, UINT_ARRAY) {
   uint32_t deserializeUINT32_Arr[5] = {0, 0, 0, 0, 0};
 
   serializer.serialize(serializeUINT32_Arr);
-
   serializer.deserialize(deserializeUINT32_Arr);
 
   for (auto i = 0 ; i < 5 ; ++i) {

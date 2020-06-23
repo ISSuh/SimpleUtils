@@ -5,6 +5,8 @@ message("SimpleUtils Serialize Examples")
 #-------------------------------------------------------------------------------
 # Set Example
 #-------------------------------------------------------------------------------
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  ${BUILD_DIR_EXAMPLES} )
+
 set( EXAMPLE_SRC
   basicType
 )

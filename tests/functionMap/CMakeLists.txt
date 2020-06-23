@@ -3,6 +3,8 @@ PROJECT (FunctionMapUnitTests)
 #-------------------------------------------------------------------------------
 # Set Test
 #-------------------------------------------------------------------------------
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  ${BUILD_DIR_TESTS} )
+
 SET ( TEST_SOURCES
 )
 

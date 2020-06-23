@@ -60,23 +60,11 @@ template<typename T, typename B>
 class TypeSerializer<T, B, typename helper::UintTraits<T>::type> {
  public:
   static void serialize(T& data, B& buf) {
-    size_t len = (sizeof(data) / sizeof(data[0]));
-
-    buf.write(data, len);
-  }
-
-  static void serialize(const T* data, B& buf) {
-    size_t len = (sizeof(data) / sizeof(data[0]));
-    buf.write(data, len);
+    buf.write(data);
   }
 
   static void deserialize(T& dst, B& buf) {
     buf.read(dst);
-  }
-
-  static void serialize(T* data, B& buf) {
-    size_t len = (sizeof(data) / sizeof(data[0]));
-    buf.read(data, len);
   }
 };
 

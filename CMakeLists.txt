@@ -18,6 +18,7 @@ SET(SIMPLE_SUTIL_TARGET_NAME ${PROJECT_NAME})
 #-------------------------------------------------------------------------------
 SET(PROJECT_DIR ${PROJECT_SOURCE_DIR})
 SET(BUILD_DIR_EXAMPLES ${CMAKE_SOURCE_DIR}/build/bin)
+SET(BUILD_DIR_TESTS ${CMAKE_SOURCE_DIR}/build/bin/tests)
 
 SET(SUTIL_INCLUDES
     ${PROJECT_DIR}/include
