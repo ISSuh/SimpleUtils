@@ -24,6 +24,14 @@ struct TypeTraits<T, typename std::enable_if<(std::is_unsigned<T>::value &&
   using type = T;
 };
 
+template <typename T>
+struct TypeTraits<T, typename std::enable_if<(std::is_array<T>::value &&
+                                              std::is_unsigned<T>::value &&
+                                              std::is_integral<T>::value), void>::type> {
+  static constexpr bool valid = true;
+  using type = T;
+};
+
 template <typename T> struct UintTraits : public TypeTraits<T> {
   static_assert(TypeTraits<T>::valid, "T - Unsupported Type");
 };
@@ -37,8 +45,18 @@ class TypeSerializer<T, B, typename helper::UintTraits<T>::type> {
     buf.write(data);
   }
 
+  static void serialize(const T* data, B& buf) {
+    size_t len = (sizeof(data) / sizeof(data[0]));
+    buf.write(data, len);
+  }
+
   static void deserialize(T& dst, B& buf) {
-    buf.read(&dst);
+    buf.read(dst);
+  }
+
+  static void serialize(T* data, B& buf) {
+    size_t len = (sizeof(data) / sizeof(data[0]));
+    buf.read(data, len);
   }
 };
 

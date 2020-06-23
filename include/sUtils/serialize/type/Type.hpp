@@ -7,6 +7,7 @@
 #ifndef SUTILS_SERIALIZE_TYPE_TYPE_HPP_
 #define SUTILS_SERIALIZE_TYPE_TYPE_HPP_
 
+#include "helper/Common.hpp"
 #include "CharSerialize.hpp"
 #include "FloatSerialize.hpp"
 #include "IntSerialize.hpp"

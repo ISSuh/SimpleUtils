@@ -33,16 +33,37 @@ class Buffer {
   }
 
   template<typename T>
-  void read(T* dst) {
-    size_t size = sizeof(*dst);
+  void write(const T* value, size_t len) {
+    size_t size = sizeof(value[0]);
+
+    const char* p = reinterpret_cast<char*>(value);
+    std::copy(p, p + (size * len), std::back_inserter(m_buf));
+  }
+
+  template<typename T>
+  void read(T& dst) {
+    size_t size = sizeof(dst);
 
     if (m_head + size > static_cast<uint32_t>(m_buf.size())) {
       throw "Out of Range";
     }
 
     std::copy(&m_buf[m_head], &m_buf[m_head] + size,
-              reinterpret_cast<char*>(dst));
+              reinterpret_cast<char*>(&dst));
     m_head += size;
+  }
+
+  template<typename T>
+  void read(T* dst, size_t len) {
+    size_t size = sizeof(dst[0]);
+
+    if (m_head + size > static_cast<uint32_t>(m_buf.size())) {
+      throw "Out of Range";
+    }
+
+    std::copy(&m_buf[m_head], &m_buf[m_head] + (size * len),
+              reinterpret_cast<char*>(dst));
+    m_head += (size * len);
   }
 
   void clear() {

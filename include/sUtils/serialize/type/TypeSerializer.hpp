@@ -16,11 +16,23 @@ template<typename T, typename B, typename ENABLE = void>
 class TypeSerializer {
  public:
   static void serialize(T& data, B& buf) {
-    buf.write(data);
+    helper::UNUSE(data);
+    helper::UNUSE(buf);
+  }
+
+  static void serialize(const T* data, B& buf) {
+    helper::UNUSE(data);
+    helper::UNUSE(buf);
   }
 
   static void deserialize(T& dst, B& buf) {
-    buf.read(&dst);
+    helper::UNUSE(dst);
+    helper::UNUSE(buf);
+  }
+
+  static void deserialize(T* dst, B& buf) {
+    helper::UNUSE(dst);
+    helper::UNUSE(buf);
   }
 };
 
