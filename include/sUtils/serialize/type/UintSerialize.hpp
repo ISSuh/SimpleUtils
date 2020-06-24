@@ -7,8 +7,6 @@
 #ifndef SUTILS_SERIALIZE_TYPE_UINTSERIALIZE_HPP_
 #define SUTILS_SERIALIZE_TYPE_UINTSERIALIZE_HPP_
 
-#include <type_traits>
-
 #include "helper/TypeTrait.hpp"
 #include "TypeSerializer.hpp"
 
@@ -31,27 +29,27 @@ struct TypeTraits<T, typename std::enable_if<(std::is_array<T>::value &&
 };
 
 template <typename T> struct UintTraits : public TypeTraits<T> {
-  static_assert(TypeTraits<T>::valid, "T - Unsupported Type");
+  static_assert(TypeTraits<T>::valid, "UintTraits: T - Unsupported Type");
 };
 
 template <typename T> struct UintTraits<T*> : public UintTraits<T> {
-  static_assert(UintTraits<T>::valid, "T* - Unsupported Type");
+  static_assert(UintTraits<T>::valid, "UintTraits: T* - Unsupported Type");
 };
 
 template <typename T> struct UintTraits<const T*> : public UintTraits<T> {
-  static_assert(UintTraits<T>::valid, "const T* - Unsupported Type");
+  static_assert(UintTraits<T>::valid, "UintTraits: const T* - Unsupported Type");
 };
 
 template <typename T> struct UintTraits<T&> : public UintTraits<T> {
-  static_assert(UintTraits<T>::valid, "T& - Unsupported Type");
+  static_assert(UintTraits<T>::valid, "UintTraits: T& - Unsupported Type");
 };
 
 template <typename T> struct UintTraits<const T&> : public UintTraits<T> {
-  static_assert(UintTraits<T>::valid, "const T& - Unsupported Type");
+  static_assert(UintTraits<T>::valid, "UintTraits: const T& - Unsupported Type");
 };
 
-template <typename T, std::size_t N> struct UintTraits<T[N]> : public UintTraits<T> {
-  static_assert(UintTraits<T>::valid, "T[N] - Unsupported Type");
+template <typename T, int N> struct UintTraits<T[N]> : public UintTraits<T> {
+  static_assert(UintTraits<T>::valid, "UintTraits: T[N] - Unsupported Type");
 };
 
 }  // namespace helper

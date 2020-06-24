@@ -7,8 +7,6 @@
 #ifndef SUTILS_SERIALIZE_TYPE_FLOATSERIALIZE_HPP_
 #define SUTILS_SERIALIZE_TYPE_FLOATSERIALIZE_HPP_
 
-#include <type_traits>
-
 #include "helper/TypeTrait.hpp"
 #include "TypeSerializer.hpp"
 

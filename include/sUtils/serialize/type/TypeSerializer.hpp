@@ -7,24 +7,11 @@
 #ifndef SUTILS_SERIALIZE_TYPE_TYPESERIALIZER_HPP_
 #define SUTILS_SERIALIZE_TYPE_TYPESERIALIZER_HPP_
 
-#include "Type.hpp"
-
 namespace sUtils {
 namespace type {
 
 template<typename T, typename B, typename ENABLE = void>
-class TypeSerializer {
- public:
-  static void serialize(T& data, B& buf) {
-    std::cout << "Base\n";
-    buf.write(data);
-  }
-
-  static void deserialize(T& dst, B& buf) {
-    std::cout << "Base\n";
-    buf.read(dst);
-  }
-};
+class TypeSerializer;
 
 }  // namespace type
 }  // namespace sUtils
