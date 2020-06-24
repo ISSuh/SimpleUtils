@@ -5,16 +5,29 @@
  */
 
 #include <iostream>
+#include <string>
 
 #include <sUtils/serialize/Serializer.hpp>
 
 int main() {
-  uint32_t serializeUINT32 = 32;
-  uint32_t deserializeUINT32 = 0;
+  std::cout << "Serialize Example\n";
 
   sUtils::Serializer serializer;
-  serializer.serialize(serializeUINT32);
-  serializer.deserialize(deserializeUINT32);
+
+  uint32_t serializeUINT32_Arr[5] = {300, 301, 302, 303, 304};
+  uint32_t deserializeUINT32_Arr[5] = {0, 0, 0, 0, 0};
+
+  // std::string serializeUINT32_Arr = "asdag";
+  // std::string deserializeUINT32_Arr = " ";
+
+  serializer.serialize(serializeUINT32_Arr);
+  serializer.deserialize(deserializeUINT32_Arr);
+
+  std::cout << "----------------------------\n";
+
+  for (auto i = 0 ; i < 5 ; ++i) {
+    std::cout << "[" << i << "] : " << serializeUINT32_Arr[i] << " / " << deserializeUINT32_Arr[i] << std::endl;
+  }
 
   return 0;
 }

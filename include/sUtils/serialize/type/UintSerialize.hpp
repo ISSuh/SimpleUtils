@@ -60,10 +60,12 @@ template<typename T, typename B>
 class TypeSerializer<T, B, typename helper::UintTraits<T>::type> {
  public:
   static void serialize(T& data, B& buf) {
+    std::cout << "UINT\n";
     buf.write(data);
   }
 
   static void deserialize(T& dst, B& buf) {
+    std::cout << "UINT\n";
     buf.read(dst);
   }
 };

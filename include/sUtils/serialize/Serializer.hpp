@@ -10,7 +10,7 @@
 #include <string>
 
 #include "Buffer.hpp"
-#include "type/TypeSerializer.hpp"
+#include "type/Type.hpp"
 
 namespace sUtils {
 
@@ -20,7 +20,7 @@ class Serializer {
   ~Serializer() = default;
 
   template <typename T>
-  void serialize(T data) {
+  void serialize(T& data) {
     type::TypeSerializer<T, Buffer>::serialize(data, m_buf);
   }
 
