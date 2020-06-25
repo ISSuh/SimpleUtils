@@ -10,7 +10,7 @@
 #include <type_traits>
 
 #include "helper/TypeTrait.hpp"
-#include "TypeSerializer.hpp"
+#include "UintSerialize.hpp"
 
 namespace sUtils {
 namespace type {

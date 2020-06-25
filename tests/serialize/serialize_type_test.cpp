@@ -52,52 +52,52 @@ TEST(Serialize, UINT_ARRAY) {
   }
 }
 
-// TEST(Serialize, INT) {
-//   sUtils::Serializer serializer;
+TEST(Serialize, INT) {
+  sUtils::Serializer serializer;
 
-//   int8_t serializeINT8 = 8;
-//   int16_t serializeINT16 = 16;
-//   int32_t serializeINT32 = 32;
-//   int64_t serializeINT64 = 64;
+  int8_t serializeINT8 = 8;
+  int16_t serializeINT16 = 16;
+  int32_t serializeINT32 = 32;
+  int64_t serializeINT64 = 64;
 
-//   int8_t deserializeINT8 = 0;
-//   int16_t deserializeINT16 = 0;
-//   int32_t deserializeINT32 = 0;
-//   int64_t deserializeINT64 = 0;
+  int8_t deserializeINT8 = 0;
+  int16_t deserializeINT16 = 0;
+  int32_t deserializeINT32 = 0;
+  int64_t deserializeINT64 = 0;
 
-//   serializer.serialize(serializeINT8);
-//   serializer.serialize(serializeINT16);
-//   serializer.serialize(serializeINT32);
-//   serializer.serialize(serializeINT64);
+  serializer.serialize(serializeINT8);
+  serializer.serialize(serializeINT16);
+  serializer.serialize(serializeINT32);
+  serializer.serialize(serializeINT64);
 
-//   serializer.deserialize(deserializeINT8);
-//   serializer.deserialize(deserializeINT16);
-//   serializer.deserialize(deserializeINT32);
-//   serializer.deserialize(deserializeINT64);
+  serializer.deserialize(deserializeINT8);
+  serializer.deserialize(deserializeINT16);
+  serializer.deserialize(deserializeINT32);
+  serializer.deserialize(deserializeINT64);
 
-//   ASSERT_EQ(serializeINT8, deserializeINT8);
-//   ASSERT_EQ(serializeINT16, deserializeINT16);
-//   ASSERT_EQ(serializeINT32, deserializeINT32);
-//   ASSERT_EQ(serializeINT64, deserializeINT64);
-// }
+  ASSERT_EQ(serializeINT8, deserializeINT8);
+  ASSERT_EQ(serializeINT16, deserializeINT16);
+  ASSERT_EQ(serializeINT32, deserializeINT32);
+  ASSERT_EQ(serializeINT64, deserializeINT64);
+}
 
-// TEST(Serialize, FLOAT) {
-//   sUtils::Serializer serializer;
+TEST(Serialize, FLOAT) {
+  sUtils::Serializer serializer;
 
-//   float serializeFLOAT = 4.4;
-//   double serializeDOUBLE = 8.8;
-//   float deserializeFLOAT = 0;
-//   double deserializeDOUBLE = 0;
+  float serializeFLOAT = 4.4;
+  double serializeDOUBLE = 8.8;
+  float deserializeFLOAT = 0;
+  double deserializeDOUBLE = 0;
 
-//   serializer.serialize(serializeFLOAT);
-//   serializer.serialize(serializeDOUBLE);
+  serializer.serialize(serializeFLOAT);
+  serializer.serialize(serializeDOUBLE);
 
-//   serializer.deserialize(deserializeFLOAT);
-//   serializer.deserialize(deserializeDOUBLE);
+  serializer.deserialize(deserializeFLOAT);
+  serializer.deserialize(deserializeDOUBLE);
 
-//   ASSERT_EQ(serializeFLOAT, deserializeFLOAT);
-//   ASSERT_EQ(serializeDOUBLE, deserializeDOUBLE);
-// }
+  ASSERT_EQ(serializeFLOAT, deserializeFLOAT);
+  ASSERT_EQ(serializeDOUBLE, deserializeDOUBLE);
+}
 
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);

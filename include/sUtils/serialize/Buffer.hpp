@@ -12,7 +12,7 @@
 #include <algorithm>
 #include <utility>
 
-#include "type/Type.hpp"
+#include "type/TypeSerializer.hpp"
 
 namespace sUtils {
 

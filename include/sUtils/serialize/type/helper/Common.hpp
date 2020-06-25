@@ -13,8 +13,8 @@ namespace sUtils {
 namespace type {
 namespace helper {
 
-template<typename T>
-void UNUSE(T&&) {}
+template<typename... Arg>
+void UNUSE(Arg&&...) {}
 
 }  // namespace helper
 }  // namespace type

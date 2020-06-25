@@ -8,7 +8,7 @@
 #define SUTILS_SERIALIZE_TYPE_FLOATSERIALIZE_HPP_
 
 #include "helper/TypeTrait.hpp"
-#include "TypeSerializer.hpp"
+#include "IntSerialize.hpp"
 
 namespace sUtils {
 namespace type {

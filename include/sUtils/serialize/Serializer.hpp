@@ -21,12 +21,13 @@ class Serializer {
 
   template <typename T>
   void serialize(T& data) {
-    type::TypeSerializer<T, Buffer>::serialize(data, m_buf);
+    std::cout << typeid(data).name() << std::endl;
+    type::TypeSerializer<T, Buffer, T>::serialize(data, m_buf);
   }
 
   template <typename T>
   void deserialize(T& data) {
-    type::TypeSerializer<T, Buffer>::deserialize(data, m_buf);
+    type::TypeSerializer<T, Buffer, T>::deserialize(data, m_buf);
   }
 
   const std::string& getSerialized() {
