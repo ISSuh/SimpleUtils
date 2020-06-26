@@ -10,36 +10,39 @@
 #include <sUtils/serialize/Serializer.hpp>
 
 int main() {
-  std::cout << "Serialize Example\n";
+  std::cout << "Serialize Example\n\n";
 
   sUtils::Serializer serializer;
 
-  uint32_t serializeUINT32_Arr[5] = {300, 301, 302, 303, 304};
-  uint32_t deserializeUINT32_Arr[5] = {0, 0, 0, 0, 0};
+  uint32_t uint32Arr[5] = {300, 301, 302, 303, 304};
+  uint32_t dst_uint32Arr[5] = {0, 0, 0, 0, 0};
+  float float32Arr[5] = {1.1, 2.2, 3.3, 4.4, 5.5};
+  float dst_float32Arr[5] = {0, 0, 0, 0, 0};
 
-  std::cout << "----------------------------\n";
+  serializer.serialize(uint32Arr);
+  serializer.serialize(float32Arr);
 
-  serializer.serialize(serializeUINT32_Arr);
-  serializer.deserialize(deserializeUINT32_Arr);
+  serializer.deserialize(dst_uint32Arr);
+  serializer.deserialize(dst_float32Arr);
 
   for (auto i = 0 ; i < 5 ; ++i) {
-    std::cout << "[" << i << "] : " << serializeUINT32_Arr[i] << " / " << deserializeUINT32_Arr[i] << std::endl;
+    std::cout << "***********************************\n";
+    std::cout << "uint32_t : [" << i << "] : " << uint32Arr[i] << " / " << dst_uint32Arr[i] << std::endl;
+    std::cout << "float : [" << i << "] : " << float32Arr[i] << " / " << dst_float32Arr[i] << std::endl;
   }
 
-  std::cout << "----------------------------\n";
+  std::cout << "=========================================\n";
+  const char* constChar = "CONST CHAR POINTER";
+  const char* de_constChar = "";
 
-  float serializeUINT32 = 300;
-  float deserializeUINT32 = 0;
+  serializer.serialize(constChar);
+  serializer.deserialize(de_constChar);
 
-  serializer.serialize(serializeUINT32);
-  serializer.deserialize(deserializeUINT32);
+  std::cout << "const char* : " << constChar << " / " << de_constChar << std::endl;
 
-  std::cout << "[" << 0 << "] : " << serializeUINT32 << " / " << deserializeUINT32 << std::endl;
+  std::is_signed<char>::value;
+  sUtils::type::helper::is_char<char>::value;
 
-  uint32_t test[5];
-  sUtils::type::helper::UintTraits<uint32_t[5]>::type test2;
-  sUtils::type::helper::FloatTraits<float>::type test3;
-  sUtils::type::helper::IntTraits<int32_t[5]>::type test4;
-
+  // typename sUtils::type::helper::CharTraits<char>::type test;
   return 0;
 }

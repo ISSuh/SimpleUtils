@@ -13,8 +13,12 @@ namespace sUtils {
 namespace type {
 namespace helper {
 
-template <typename T, typename ENABLE = void>
-struct TypeTraits {};
+template <typename T, typename ENABLE = void> struct TypeTraits {};
+
+template<typename C> struct is_char : std::integral_constant<bool, std::is_same<C, char>::value ||
+                                                                   std::is_same<C, char16_t>::value ||
+                                                                   std::is_same<C, char32_t>::value ||
+                                                                   std::is_same<C, wchar_t>::value> {};
 
 }  // namespace helper
 }  // namespace type

@@ -19,7 +19,7 @@ template <typename T, typename ENABLE = void>
 struct IntTraits : TypeTraits<T>{};
 
 template <typename T>
-struct IntTraits<T, typename std::enable_if<!std::is_unsigned<T>::value &&
+struct IntTraits<T, typename std::enable_if<std::is_signed<T>::value &&
                                             std::is_integral<T>::value>::type> {
   static constexpr bool valid = true;
   using type = T;
@@ -27,7 +27,7 @@ struct IntTraits<T, typename std::enable_if<!std::is_unsigned<T>::value &&
 
 template <typename T, std::size_t N>
 struct IntTraits<T[N], typename std::enable_if<std::is_array<T[N]>::value &&
-                                               !std::is_unsigned<T>::value &&
+                                               std::is_signed<T>::value &&
                                                std::is_integral<T>::value>::type> {
   static constexpr bool valid = true;
   using type = T[N];
