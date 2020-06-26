@@ -37,8 +37,9 @@ int main() {
   std::cout << "[" << 0 << "] : " << serializeUINT32 << " / " << deserializeUINT32 << std::endl;
 
   uint32_t test[5];
-  sUtils::type::helper::UintTraits<float[5]>::type test2;
+  sUtils::type::helper::UintTraits<uint32_t[5]>::type test2;
   sUtils::type::helper::FloatTraits<float>::type test3;
+  sUtils::type::helper::IntTraits<int32_t[5]>::type test4;
 
   return 0;
 }

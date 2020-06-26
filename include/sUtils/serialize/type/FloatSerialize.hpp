@@ -24,15 +24,9 @@ struct FloatTraits<T, typename std::enable_if<std::is_floating_point<T>::value>:
   using type = T;
 };
 
-template <typename T>
-struct FloatTraits<T, typename std::enable_if<std::is_floating_point<T>::value &&
-                                               std::is_array<T>::value>::type> {
-  static constexpr bool valid = true;
-  using type = T;
-};
-
 template <typename T, std::size_t N>
-struct FloatTraits<T[N], typename std::enable_if<std::is_array<T[N]>::value>::type> {
+struct FloatTraits<T[N], typename std::enable_if<std::is_array<T[N]>::value &&
+                                                std::is_floating_point<T>::value>::type> {
   static constexpr bool valid = true;
   using type = T[N];
 };
