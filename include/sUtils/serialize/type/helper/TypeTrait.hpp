@@ -14,10 +14,7 @@ namespace type {
 namespace helper {
 
 template <typename T, typename ENABLE = void>
-struct TypeTraits {
-  static constexpr bool valid = false;
-  using type = T;
-};
+struct TypeTraits {};
 
 }  // namespace helper
 }  // namespace type

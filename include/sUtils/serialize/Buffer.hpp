@@ -25,10 +25,10 @@ class Buffer {
   }
 
   template<typename T>
-  void write(T& value) {
+  void write(const T& value) {
     size_t size = sizeof(value);
 
-    const char* p = reinterpret_cast<char*>(&value);
+    const char* p = reinterpret_cast<const char*>(&value);
     std::copy(p, p + size, std::back_inserter(m_buf));
   }
 

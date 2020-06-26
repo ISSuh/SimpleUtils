@@ -9,8 +9,8 @@
 
 #include <string>
 
-#include "Buffer.hpp"
 #include "type/Type.hpp"
+#include "Buffer.hpp"
 
 namespace sUtils {
 
@@ -20,8 +20,7 @@ class Serializer {
   ~Serializer() = default;
 
   template <typename T>
-  void serialize(T& data) {
-    std::cout << typeid(data).name() << std::endl;
+  void serialize(const T& data) {
     type::TypeSerializer<T, Buffer, T>::serialize(data, m_buf);
   }
 
