@@ -4,6 +4,8 @@
  * 
  */
 
+#include <string>
+
 #include <gtest/gtest.h>
 
 #include <sUtils/serialize/Serializer.hpp>
@@ -99,17 +101,17 @@ TEST(Serialize, FLOAT) {
 
   float serializeFLOAT = 4.4;
   double serializeDOUBLE = 8.8;
-  float deserializeFLOAT = 0;
-  double deserializeDOUBLE = 0;
+  float dstFloat = 0;
+  double dstDouble = 0;
 
   serializer.serialize(serializeFLOAT);
   serializer.serialize(serializeDOUBLE);
 
-  serializer.deserialize(deserializeFLOAT);
-  serializer.deserialize(deserializeDOUBLE);
+  serializer.deserialize(dstFloat);
+  serializer.deserialize(dstDouble);
 
-  ASSERT_EQ(serializeFLOAT, deserializeFLOAT);
-  ASSERT_EQ(serializeDOUBLE, deserializeDOUBLE);
+  ASSERT_EQ(serializeFLOAT, dstFloat);
+  ASSERT_EQ(serializeDOUBLE, dstDouble);
 }
 
 
@@ -117,14 +119,50 @@ TEST(Serialize, FLOAT_ARRAY) {
   sUtils::Serializer serializer;
 
   float serializeFLOAT_Arr[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
-  float deserializeFLOAT_Arr[5] = {0.0, 0.0, 0.0, 0.0, 0.0};
+  float dst[5] = {0.0, 0.0, 0.0, 0.0, 0.0};
 
   serializer.serialize(serializeFLOAT_Arr);
-  serializer.deserialize(deserializeFLOAT_Arr);
+  serializer.deserialize(dst);
 
   for (auto i = 0 ; i < 5 ; ++i) {
-    ASSERT_EQ(serializeFLOAT_Arr[i], deserializeFLOAT_Arr[i]);
+    ASSERT_EQ(serializeFLOAT_Arr[i], dst[i]);
   }
+}
+
+TEST(Serialize, CONST_CHAR_PTR) {
+  sUtils::Serializer serializer;
+
+  const char* cStr = "const char*";
+  const char* dst = "";
+
+  serializer.serialize(cStr);
+  serializer.deserialize(dst);
+
+  ASSERT_EQ(cStr, dst);
+}
+
+TEST(Serialize, STRING) {
+  sUtils::Serializer serializer;
+
+  std::string str("std::string");
+  std::string dst("");
+
+  serializer.serialize(str);
+  serializer.deserialize(dst);
+
+  ASSERT_EQ(str, dst);
+}
+
+TEST(Serialize, CONST_STRING_REFERENCE) {
+  sUtils::Serializer serializer;
+
+  const std::string& str = "std::string";
+  std::string dst("");
+
+  serializer.serialize(str);
+  serializer.deserialize(dst);
+
+  ASSERT_EQ(str, dst);
 }
 
 int main(int argc, char** argv) {

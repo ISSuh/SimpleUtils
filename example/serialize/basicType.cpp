@@ -40,9 +40,5 @@ int main() {
 
   std::cout << "const char* : " << constChar << " / " << de_constChar << std::endl;
 
-  std::is_signed<char>::value;
-  sUtils::type::helper::is_char<char>::value;
-
-  // typename sUtils::type::helper::CharTraits<char>::type test;
   return 0;
 }
