@@ -6,7 +6,7 @@ PROJECT (SerializeUnitTests)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  ${BUILD_DIR_TESTS} )
 
 SET ( TEST_SOURCES
-  serialize_type_test
+  serialize_basic_type_test
 )
 
 #-------------------------------------------------------------------------------

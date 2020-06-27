@@ -32,13 +32,41 @@ int main() {
   }
 
   std::cout << "=========================================\n";
-  std::string constChar("CONST STRING REFERENCE");
-  std::string de_constChar = "";
 
-  serializer.serialize(constChar);
-  serializer.deserialize(de_constChar);
+  uint8_t serializeUINT8 = 8;
+  uint16_t serializeUINT16 = 16;
+  uint32_t serializeUINT32 = 32;
+  uint64_t serializeUINT64 = 64;
 
-  std::cout << constChar << " / " << de_constChar << std::endl;
+  uint8_t deserializeUINT8 = 0;
+  uint16_t deserializeUINT16 = 0;
+  uint32_t deserializeUINT32 = 0;
+  uint64_t deserializeUINT64 = 0;
+
+  serializer.serialize(serializeUINT8);
+  serializer.serialize(serializeUINT16);
+  serializer.serialize(serializeUINT32);
+  serializer.serialize(serializeUINT64);
+
+  serializer.deserialize(deserializeUINT8);
+  serializer.deserialize(deserializeUINT16);
+  serializer.deserialize(deserializeUINT32);
+  serializer.deserialize(deserializeUINT64);
+
+  std::cout << serializeUINT8 << " / " << deserializeUINT8 << std::endl;
+  std::cout << serializeUINT16 << " / " << deserializeUINT16 << std::endl;
+  std::cout << serializeUINT32 << " / " << deserializeUINT32 << std::endl;
+  std::cout << serializeUINT64 << " / " << deserializeUINT64 << std::endl;
+
+  std::cout << "=========================================\n";
+
+  std::string s1("string");
+  std::string d1("");
+
+  serializer.serialize(s1);
+  serializer.deserialize(d1);
+
+  std::cout << s1 << " / " << d1 << std::endl;
 
   std::cout << "=========================================\n";
 

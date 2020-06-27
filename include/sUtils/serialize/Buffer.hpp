@@ -61,6 +61,21 @@ class Buffer {
     updateBufferByteInfo();
   }
 
+  template<>
+  void read(std::string& dst, size_t len) {
+    if (len > static_cast<uint32_t>(m_buf.size())) {
+      throw "Out of Range";
+    }
+
+    auto beginBytePos = m_argByteRange.front().first;
+    auto endBytePos = m_argByteRange.front().second;
+
+    dst.copy(&m_buf[beginBytePos], endBytePos - beginBytePos);
+    // std::copy(&m_buf[beginBytePos], &m_buf[endBytePos], &dst[0]);
+
+    updateBufferByteInfo();
+  }
+
   void clear() {
     m_buf.clear();
 
@@ -91,7 +106,7 @@ class Buffer {
 
  private:
   void updateBufferByteInfo(size_t len) {
-    auto nextBytePos = m_argCount == 0 ? 0 : m_argByteRange.front().second + 1;
+    auto nextBytePos = m_argCount == 0 ? 0 : m_argByteRange.back().second + 1;
 
     m_argByteRange.emplace(std::make_pair(nextBytePos, nextBytePos + len - 1));
 

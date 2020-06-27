@@ -31,7 +31,7 @@ template<typename T, typename B>
 class TypeSerializer<T, B, std::string> {
  public:
   static void serialize(const T& data, B& buf) {
-    buf.write(data, data.length());
+    buf.write(data.c_str(), data.length()+1);
   }
 
   static void deserialize(T& dst, B& buf) {

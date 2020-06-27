@@ -165,6 +165,56 @@ TEST(Serialize, CONST_STRING_REFERENCE) {
   ASSERT_EQ(str, dst);
 }
 
+TEST(Serialize, MIX) {
+  sUtils::Serializer serializer;
+
+  int32_t s1 = -32;
+  uint8_t s2 = 8;
+  double s3 = 8.8;
+  int32_t s4 = -32;
+  const char* s5 = "const char*";
+  const std::string& s6("const std::string&");
+  uint16_t s7[3] = {5, 6, 7};
+  float s8[3] = {5.5, 6.6, 7.7};
+
+  int32_t d1;
+  uint8_t d2;
+  double d3;
+  int32_t d4;
+  char* d5 = "";
+  std::string d6("");
+  uint16_t d7[3];
+  float d8[3];
+
+  serializer.serialize(s1);
+  serializer.serialize(s2);
+  serializer.serialize(s3);
+  serializer.serialize(s4);
+  serializer.serialize(s5);
+  serializer.serialize(s6);
+  serializer.serialize(s7);
+  serializer.serialize(s8);
+
+  serializer.deserialize(d1);
+  serializer.deserialize(d2);
+  serializer.deserialize(d3);
+  serializer.deserialize(d4);
+  serializer.deserialize(d5);
+  serializer.deserialize(d6);
+  serializer.deserialize(d7);
+  serializer.deserialize(d8);
+
+  ASSERT_EQ(s1, d1);
+  ASSERT_EQ(s2, d2);
+  ASSERT_EQ(s3, d3);
+  ASSERT_EQ(s4, d4);
+  ASSERT_EQ(s5, d5);
+  ASSERT_EQ(s6, d6);
+  ASSERT_EQ(s7, d7);
+  ASSERT_EQ(s8, d8);
+}
+
+
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
