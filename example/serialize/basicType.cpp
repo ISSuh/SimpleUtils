@@ -32,13 +32,15 @@ int main() {
   }
 
   std::cout << "=========================================\n";
-  const char* constChar = "CONST CHAR POINTER";
-  const char* de_constChar = "";
+  std::string constChar("CONST STRING REFERENCE");
+  std::string de_constChar = "";
 
   serializer.serialize(constChar);
   serializer.deserialize(de_constChar);
 
-  std::cout << "const char* : " << constChar << " / " << de_constChar << std::endl;
+  std::cout << constChar << " / " << de_constChar << std::endl;
+
+  // sUtils::type::helper::is_string<std::string>::value;
 
   return 0;
 }

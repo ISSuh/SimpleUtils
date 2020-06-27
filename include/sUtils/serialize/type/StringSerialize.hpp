@@ -15,12 +15,23 @@
 namespace sUtils {
 namespace type {
 
+namespace helper {
+
+// template<typename T>
+// struct is_string : std::disjunction<
+//                 std::is_same<char *, typename std::decay<T>::type>,
+//                 std::is_same<const char *, typename std::decay<T>::type>,
+//                 std::is_same<std::string, typename std::decay<T>::type>
+//         > {
+// };
+
+}  // namespace helper
+
 template<typename T, typename B>
-class TypeSerializer<T, B, const std::string&> {
+class TypeSerializer<T, B, std::string> {
  public:
   static void serialize(const T& data, B& buf) {
-    std::cout << "string\n";
-    buf.write(data);
+    buf.write(data, data.length());
   }
 
   static void deserialize(T& dst, B& buf) {
