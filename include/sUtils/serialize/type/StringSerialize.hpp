@@ -35,7 +35,7 @@ class TypeSerializer<T, B, std::string> {
   }
 
   static void deserialize(T& dst, B& buf) {
-    buf.read(dst);
+    buf.read(dst, dst.length());
   }
 };
 

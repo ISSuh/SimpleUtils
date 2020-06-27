@@ -19,9 +19,8 @@ namespace sUtils {
 
 class Buffer {
  public:
-  Buffer() : m_head(0) {}
+  Buffer() : m_argCount(0), m_argHead(-1)  {}
   explicit Buffer(size_t size) : m_buf(std::vector<char>(size)),
-                                 m_head(0),
                                  m_argCount(0),
                                  m_argHead(-1) {}
   ~Buffer() {
@@ -50,20 +49,20 @@ class Buffer {
 
   template<typename T>
   void read(T& dst, size_t len) {
-    if (m_head + len > static_cast<uint32_t>(m_buf.size())) {
+    if (len > static_cast<uint32_t>(m_buf.size())) {
       throw "Out of Range";
     }
 
-    std::copy(&m_buf[m_head], &m_buf[m_head] + len,
-              reinterpret_cast<char*>(&dst));
-    m_head += size;
+    auto beginBytePos = m_argByteRange.front().first;
+    auto endBytePos = m_argByteRange.front().second;
+
+    std::copy(&m_buf[beginBytePos], &m_buf[endBytePos] + 1, reinterpret_cast<char*>(&dst));
 
     updateBufferByteInfo();
   }
 
   void clear() {
     m_buf.clear();
-    m_head = 0;
 
     clearBufferByteInfo();
   }
@@ -76,7 +75,7 @@ class Buffer {
     write(serializedValue);
   }
 
-  const size_t getCount() const { return m_argCount; }
+  size_t getCount() const { return m_argCount; }
 
   template<typename T>
   Buffer& operator<<(const T& rhs) {
@@ -92,9 +91,9 @@ class Buffer {
 
  private:
   void updateBufferByteInfo(size_t len) {
-    auto nextBytePos = m_argCount == 0 ? 0 : m_argByteRange[m_argHead].second + 1;
+    auto nextBytePos = m_argCount == 0 ? 0 : m_argByteRange.front().second + 1;
 
-    m_argByteRange.emplace(std::make_pair(nextBytePos, nextBytePos + len));
+    m_argByteRange.emplace(std::make_pair(nextBytePos, nextBytePos + len - 1));
 
     ++m_argHead;
     ++m_argCount;
@@ -104,17 +103,22 @@ class Buffer {
     m_argByteRange.pop();
     --m_argHead;
     --m_argCount;
+
+    if (!m_argCount) {
+      clear();
+    }
   }
 
   void clearBufferByteInfo() {
-    m_argByteRange.clear();
+    std::queue<std::pair<size_t, size_t>> empty;
+    std::swap(m_argByteRange, empty);
+
     m_argHead = -1;
     m_argCount = 0;
   }
 
  private:
   std::vector<char> m_buf;
-  uint32_t m_head;
 
   std::queue<std::pair<size_t, size_t>> m_argByteRange;
   size_t m_argCount;
