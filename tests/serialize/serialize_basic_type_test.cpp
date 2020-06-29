@@ -6,9 +6,8 @@
 
 #include <string>
 
-#include <gtest/gtest.h>
-
 #include <sUtils/serialize/Serializer.hpp>
+#include <gtest/gtest.h>
 
 TEST(Serialize, UINT) {
   sUtils::Serializer serializer;

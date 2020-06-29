@@ -7,6 +7,7 @@
 #ifndef SUTILS_SERIALIZE_TYPE_TYPESERIALIZER_HPP_
 #define SUTILS_SERIALIZE_TYPE_TYPESERIALIZER_HPP_
 
+#include <iostream>
 #include <typeinfo>
 
 namespace sUtils {

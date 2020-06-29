@@ -77,18 +77,6 @@ class Buffer {
 
   size_t getCount() const { return m_argCount; }
 
-  // template<typename T>
-  // Buffer& operator<<(const T& rhs) {
-  //   type::TypeSerializer<T, Buffer>::serialize(rhs, *this);
-  //   return *this;
-  // }
-
-  // template<typename T>
-  // Buffer& operator>>(const T& rhs) {
-  //   type::TypeSerializer<T, Buffer>::deserialize(rhs, *this);
-  //   return *this;
-  // }
-
  private:
   void updateBufferByteInfo(size_t len) {
     auto nextBytePos = m_argCount == 0 ? 0 : m_argByteRange.back().second + 1;
@@ -126,7 +114,7 @@ class Buffer {
 };
 
 template<>
-void Buffer::write(const std::string& value, size_t len) {
+inline void Buffer::write(const std::string& value, size_t len) {
   const char* p = value.c_str();
   std::copy(p, p + len, std::back_inserter(m_buf));
 
