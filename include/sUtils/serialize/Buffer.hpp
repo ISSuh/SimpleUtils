@@ -61,21 +61,6 @@ class Buffer {
     updateBufferByteInfo();
   }
 
-  template<>
-  void read(std::string& dst, size_t len) {
-    if (len > static_cast<uint32_t>(m_buf.size())) {
-      throw "Out of Range";
-    }
-
-    auto beginBytePos = m_argByteRange.front().first;
-    auto endBytePos = m_argByteRange.front().second;
-
-    dst.copy(&m_buf[beginBytePos], endBytePos - beginBytePos);
-    // std::copy(&m_buf[beginBytePos], &m_buf[endBytePos], &dst[0]);
-
-    updateBufferByteInfo();
-  }
-
   void clear() {
     m_buf.clear();
 
@@ -139,6 +124,28 @@ class Buffer {
   size_t m_argCount;
   int32_t m_argHead;
 };
+
+template<>
+void Buffer::write(const std::string& value, size_t len) {
+  const char* p = value.c_str();
+  std::copy(p, p + len, std::back_inserter(m_buf));
+
+  updateBufferByteInfo(len);
+}
+
+template<>
+inline void Buffer::read(std::string& dst, size_t len) {
+  if (len > static_cast<uint32_t>(m_buf.size())) {
+    throw "Out of Range";
+  }
+
+  auto beginBytePos = m_argByteRange.front().first;
+  auto endBytePos = m_argByteRange.front().second + 1;
+
+  std::copy(&m_buf[beginBytePos], &m_buf[endBytePos], std::back_inserter(dst));
+
+  updateBufferByteInfo();
+}
 
 }  // namespace sUtils
 
