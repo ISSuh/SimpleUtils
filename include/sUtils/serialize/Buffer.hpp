@@ -77,17 +77,17 @@ class Buffer {
 
   size_t getCount() const { return m_argCount; }
 
-  template<typename T>
-  Buffer& operator<<(const T& rhs) {
-    type::TypeSerializer<T, Buffer>::serialize(rhs, *this);
-    return *this;
-  }
+  // template<typename T>
+  // Buffer& operator<<(const T& rhs) {
+  //   type::TypeSerializer<T, Buffer>::serialize(rhs, *this);
+  //   return *this;
+  // }
 
-  template<typename T>
-  Buffer& operator>>(const T& rhs) {
-    type::TypeSerializer<T, Buffer>::deserialize(rhs, *this);
-    return *this;
-  }
+  // template<typename T>
+  // Buffer& operator>>(const T& rhs) {
+  //   type::TypeSerializer<T, Buffer>::deserialize(rhs, *this);
+  //   return *this;
+  // }
 
  private:
   void updateBufferByteInfo(size_t len) {

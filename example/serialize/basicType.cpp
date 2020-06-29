@@ -63,12 +63,10 @@ int main() {
   std::string s1("string");
   std::string d1("");
 
-  serializer.serialize(s1);
-  serializer.deserialize(d1);
+  serializer << s1;
+  serializer >> d1;
 
   std::cout << s1 << " / " << d1 << std::endl;
-
-  std::cout << "=========================================\n";
 
   return 0;
 }

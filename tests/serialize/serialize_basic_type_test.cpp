@@ -23,15 +23,8 @@ TEST(Serialize, UINT) {
   uint32_t deserializeUINT32 = 0;
   uint64_t deserializeUINT64 = 0;
 
-  serializer.serialize(serializeUINT8);
-  serializer.serialize(serializeUINT16);
-  serializer.serialize(serializeUINT32);
-  serializer.serialize(serializeUINT64);
-
-  serializer.deserialize(deserializeUINT8);
-  serializer.deserialize(deserializeUINT16);
-  serializer.deserialize(deserializeUINT32);
-  serializer.deserialize(deserializeUINT64);
+  serializer << serializeUINT8 << serializeUINT16 << serializeUINT32 << serializeUINT64;
+  serializer >> deserializeUINT8 >> deserializeUINT16 >> deserializeUINT32 >> deserializeUINT64;
 
   ASSERT_EQ(serializeUINT8, deserializeUINT8);
   ASSERT_EQ(serializeUINT16, deserializeUINT16);
@@ -45,8 +38,8 @@ TEST(Serialize, UINT_ARRAY) {
   uint32_t serializeUINT32_Arr[5] = {1, 2, 3, 4, 5};
   uint32_t deserializeUINT32_Arr[5] = {0, 0, 0, 0, 0};
 
-  serializer.serialize(serializeUINT32_Arr);
-  serializer.deserialize(deserializeUINT32_Arr);
+  serializer << serializeUINT32_Arr;
+  serializer >> deserializeUINT32_Arr;
 
   for (auto i = 0 ; i < 5 ; ++i) {
     ASSERT_EQ(serializeUINT32_Arr[i], deserializeUINT32_Arr[i]);
@@ -66,15 +59,8 @@ TEST(Serialize, INT) {
   int32_t deserializeINT32 = 0;
   int64_t deserializeINT64 = 0;
 
-  serializer.serialize(serializeINT8);
-  serializer.serialize(serializeINT16);
-  serializer.serialize(serializeINT32);
-  serializer.serialize(serializeINT64);
-
-  serializer.deserialize(deserializeINT8);
-  serializer.deserialize(deserializeINT16);
-  serializer.deserialize(deserializeINT32);
-  serializer.deserialize(deserializeINT64);
+  serializer << serializeINT8 << serializeINT16 << serializeINT32 << serializeINT64;
+  serializer >> deserializeINT8 >> deserializeINT16 >> deserializeINT32 >> deserializeINT64;
 
   ASSERT_EQ(serializeINT8, deserializeINT8);
   ASSERT_EQ(serializeINT16, deserializeINT16);
@@ -88,8 +74,8 @@ TEST(Serialize, INT_ARRAY) {
   int32_t serializeINT32_Arr[5] = {-1, -2, -3, -4, -5};
   int32_t deserializeINT32_Arr[5] = {0, 0, 0, 0, 0};
 
-  serializer.serialize(serializeINT32_Arr);
-  serializer.deserialize(deserializeINT32_Arr);
+  serializer << serializeINT32_Arr;
+  serializer >> deserializeINT32_Arr;
 
   for (auto i = 0 ; i < 5 ; ++i) {
     ASSERT_EQ(serializeINT32_Arr[i], deserializeINT32_Arr[i]);
@@ -104,11 +90,8 @@ TEST(Serialize, FLOAT) {
   float dstFloat = 0;
   double dstDouble = 0;
 
-  serializer.serialize(serializeFLOAT);
-  serializer.serialize(serializeDOUBLE);
-
-  serializer.deserialize(dstFloat);
-  serializer.deserialize(dstDouble);
+  serializer << serializeFLOAT << serializeDOUBLE;
+  serializer >> dstFloat >> dstDouble;
 
   ASSERT_EQ(serializeFLOAT, dstFloat);
   ASSERT_EQ(serializeDOUBLE, dstDouble);
@@ -121,8 +104,8 @@ TEST(Serialize, FLOAT_ARRAY) {
   float serializeFLOAT_Arr[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
   float dst[5] = {0.0, 0.0, 0.0, 0.0, 0.0};
 
-  serializer.serialize(serializeFLOAT_Arr);
-  serializer.deserialize(dst);
+  serializer << serializeFLOAT_Arr;
+  serializer >> dst;
 
   for (auto i = 0 ; i < 5 ; ++i) {
     ASSERT_EQ(serializeFLOAT_Arr[i], dst[i]);
@@ -135,8 +118,8 @@ TEST(Serialize, STRING) {
   std::string str("std::string");
   std::string dst("");
 
-  serializer.serialize(str);
-  serializer.deserialize(dst);
+  serializer << str;
+  serializer >> dst;
 
   ASSERT_EQ(str, dst);
 }
@@ -147,8 +130,8 @@ TEST(Serialize, CONST_STRING_REFERENCE) {
   const std::string& str = "std::string";
   std::string dst("");
 
-  serializer.serialize(str);
-  serializer.deserialize(dst);
+  serializer << str;
+  serializer >> dst;
 
   ASSERT_EQ(str, dst);
 }
@@ -174,21 +157,9 @@ TEST(Serialize, MIX) {
   uint16_t d7[LEN];
   float d8[LEN];
 
-  serializer.serialize(s1);
-  serializer.serialize(s2);
-  serializer.serialize(s3);
-  serializer.serialize(s4);
-  serializer.serialize(s6);
-  serializer.serialize(s7);
-  serializer.serialize(s8);
+  serializer << s1 << s2 << s3 << s4 << s6 << s7 << s8;
 
-  serializer.deserialize(d1);
-  serializer.deserialize(d2);
-  serializer.deserialize(d3);
-  serializer.deserialize(d4);
-  serializer.deserialize(d6);
-  serializer.deserialize(d7);
-  serializer.deserialize(d8);
+  serializer >> d1 >> d2 >> d3 >> d4 >> d6 >> d7 >> d8;
 
   ASSERT_EQ(s1, d1);
   ASSERT_EQ(s2, d2);
@@ -196,12 +167,11 @@ TEST(Serialize, MIX) {
   ASSERT_EQ(s4, d4);
   ASSERT_EQ(s6, d6);
 
-  for (auto i = 0 ; i < LEN ; ++i) {
+  for (size_t i = 0 ; i < LEN ; ++i) {
     ASSERT_EQ(s7[i], d7[i]);
     ASSERT_EQ(s8[i], d8[i]);
   }
 }
-
 
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);

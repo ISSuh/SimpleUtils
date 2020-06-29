@@ -25,12 +25,25 @@ class Serializer {
   }
 
   template <typename T>
-  void deserialize(T& data) {
-    type::TypeSerializer<T, Buffer, T>::deserialize(data, m_buf);
+  void deserialize(T& dst) {
+    type::TypeSerializer<T, Buffer, T>::deserialize(dst, m_buf);
   }
 
   const std::string& getSerialized() {
     return m_buf.toString();
+  }
+
+
+  template<typename T>
+  Serializer& operator<<(const T& data) {
+    type::TypeSerializer<T, Buffer, T>::serialize(data, m_buf);
+    return *this;
+  }
+
+  template<typename T>
+  Serializer& operator>>(T& dst) {
+    type::TypeSerializer<T, Buffer, T>::deserialize(dst, m_buf);
+    return *this;
   }
 
  private:
