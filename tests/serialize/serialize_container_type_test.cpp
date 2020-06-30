@@ -37,6 +37,20 @@ TEST(Serialize, DOUBLE_VECTOR) {
   }
 }
 
+TEST(Serialize, STRING_VECTOR) {
+  sUtils::Serializer serializer;
+
+  std::vector<std::string> s = {"Aa", "Bdasdasd", "Ccccsa", "Degtr", "E12134"};
+  std::vector<std::string> d;
+
+  serializer << s;
+  serializer >> d;
+
+  for (size_t i = 0 ; i < s.size() ; ++i) {
+    ASSERT_EQ(s[i], d[i]);
+  }
+}
+
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

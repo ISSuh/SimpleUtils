@@ -35,7 +35,7 @@ template<typename T, typename B>
 class TypeSerializer<T, B, typename helper::VectorTraits<T>::type> {
  public:
   static void serialize(const T& data, B& buf) {
-    buf.write(data, data.size());
+    buf.write(data);
   }
 
   static void deserialize(T& dst, B& buf) {

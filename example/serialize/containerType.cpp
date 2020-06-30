@@ -11,13 +11,13 @@
 
 int main() {
   std::cout << "=========================================\n";
-  std::cout << "Serialize Example - Container Type\n\n";
+  std::cout << "Serialize Example - Container Type\n";
   std::cout << "=========================================\n";
 
   sUtils::Serializer serializer;
 
-  std::vector<uint32_t> s = {1, 2, 3, 4, 5};
-  std::vector<uint32_t> d;
+  std::vector<std::string> s = {"Aaasdasdasdasdadaasdasaasads", "Bdasdasd", "Ccccsa", "Degtr", "E12134"};
+  std::vector<std::string> d;
 
   serializer << s;
   serializer >> d;
