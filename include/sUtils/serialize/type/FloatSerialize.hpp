@@ -19,16 +19,17 @@ template <typename T, typename ENABLE = void>
 struct FloatTraits : TypeTraits<T>{};
 
 template <typename T>
-struct FloatTraits<T, typename std::enable_if<std::is_floating_point<T>::value>::type> {
+struct FloatTraits<T, typename std::enable_if<std::is_floating_point<T>::value, void>::type> {
   static constexpr bool valid = true;
-  using type = T;
+  using type = typename std::enable_if<std::is_floating_point<T>::value, void>::type;
 };
 
 template <typename T, std::size_t N>
 struct FloatTraits<T[N], typename std::enable_if<std::is_array<T[N]>::value &&
-                                                std::is_floating_point<T>::value>::type> {
+                                                std::is_floating_point<T>::value, void>::type> {
   static constexpr bool valid = true;
-  using type = T[N];
+  using type = typename std::enable_if<std::is_array<T[N]>::value &&
+                                                std::is_floating_point<T>::value, void>::type;
 };
 
 }  // namespace helper
@@ -37,10 +38,12 @@ template<typename T, typename B>
 class TypeSerializer<T, B, typename helper::FloatTraits<T>::type> {
  public:
   static void serialize(const T& data, B& buf) {
+    std::cout << "float\n";
     buf.write(data);
   }
 
   static void deserialize(T& dst, B& buf) {
+    std::cout << "float\n";
     buf.read(dst);
   }
 };

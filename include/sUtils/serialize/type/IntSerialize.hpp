@@ -22,7 +22,8 @@ template <typename T>
 struct IntTraits<T, typename std::enable_if<std::is_signed<T>::value &&
                                             std::is_integral<T>::value>::type> {
   static constexpr bool valid = true;
-  using type = T;
+  using type = typename std::enable_if<std::is_signed<T>::value &&
+                                            std::is_integral<T>::value>::type;
 };
 
 template <typename T, std::size_t N>
@@ -30,7 +31,9 @@ struct IntTraits<T[N], typename std::enable_if<std::is_array<T[N]>::value &&
                                                std::is_signed<T>::value &&
                                                std::is_integral<T>::value>::type> {
   static constexpr bool valid = true;
-  using type = T[N];
+  using type = typename std::enable_if<std::is_array<T[N]>::value &&
+                                               std::is_signed<T>::value &&
+                                               std::is_integral<T>::value>::type;
 };
 
 }  // namespace helper
@@ -39,10 +42,12 @@ template<typename T, typename B>
 class TypeSerializer<T, B, typename helper::IntTraits<T>::type> {
  public:
   static void serialize(const T& data, B& buf) {
+    std::cout << "int\n";
     buf.write(data);
   }
 
   static void deserialize(T& dst, B& buf) {
+    std::cout << "int\n";
     buf.read(dst);
   }
 };

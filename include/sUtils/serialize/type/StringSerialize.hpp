@@ -8,6 +8,7 @@
 #define SUTILS_SERIALIZE_TYPE_STRINGSERIALIZE_HPP_
 
 #include <string>
+#include <cstring>
 
 #include "helper/TypeTrait.hpp"
 #include "TypeSerializer.hpp"
@@ -15,14 +16,26 @@
 namespace sUtils {
 namespace type {
 
-template<typename T, typename B>
-class TypeSerializer<T, B, std::string> {
+template<typename B>
+class TypeSerializer<char*, B> {
  public:
-  static void serialize(const T& data, B& buf) {
+  static void serialize(const char* data, B& buf) {
+    buf.write(data, strlen(data));
+  }
+
+  static void deserialize(char* dst, B& buf) {
+    buf.read(dst, strlen(dst));
+  }
+};
+
+template<typename B>
+class TypeSerializer<std::string, B> {
+ public:
+  static void serialize(const std::string& data, B& buf) {
     buf.write(data, data.length());
   }
 
-  static void deserialize(T& dst, B& buf) {
+  static void deserialize(std::string& dst, B& buf) {
     buf.read(dst, dst.length());
   }
 };
