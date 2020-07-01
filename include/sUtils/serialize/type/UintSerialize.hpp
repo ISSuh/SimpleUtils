@@ -19,16 +19,17 @@ template <typename T, typename ENABLE = void>
 struct UintTraits : TypeTraits<T> {};
 
 template <typename T>
-struct UintTraits<T, typename std::enable_if<std::is_unsigned<T>::value>::type> {
+struct UintTraits<T, typename std::enable_if<std::is_unsigned<T>::value, void>::type> {
   static constexpr bool valid = true;
-  using type = T;
+  using type = typename std::enable_if<std::is_unsigned<T>::value, void>::type;
 };
 
 template <typename T, std::size_t N>
 struct UintTraits<T[N], typename std::enable_if<std::is_array<T[N]>::value &&
-                                                std::is_unsigned<T>::value>::type> {
+                                                std::is_unsigned<T>::value, void>::type> {
   static constexpr bool valid = true;
-  using type = T[N];
+  using type = typename std::enable_if<std::is_array<T[N]>::value &&
+                                                std::is_unsigned<T>::value, void>::type;
 };
 
 }  // namespace helper
@@ -37,10 +38,12 @@ template<typename T, typename B>
 class TypeSerializer<T, B, typename helper::UintTraits<T>::type> {
  public:
   static void serialize(const T& data, B& buf) {
+    std::cout << "uint\n";
     buf.write(data);
   }
 
   static void deserialize(T& dst, B& buf) {
+    std::cout << "uint\n";
     buf.read(dst);
   }
 };

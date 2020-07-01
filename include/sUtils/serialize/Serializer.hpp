@@ -21,12 +21,12 @@ class Serializer {
 
   template <typename T>
   void serialize(const T& data) {
-    type::TypeSerializer<T, Buffer, T>::serialize(data, m_buf);
+    type::TypeSerializer<T, Buffer>::serialize(data, m_buf);
   }
 
   template <typename T>
   void deserialize(T& dst) {
-    type::TypeSerializer<T, Buffer, T>::deserialize(dst, m_buf);
+    type::TypeSerializer<T, Buffer>::deserialize(dst, m_buf);
   }
 
   const std::string& getSerialized() {
@@ -36,13 +36,13 @@ class Serializer {
 
   template<typename T>
   Serializer& operator<<(const T& data) {
-    type::TypeSerializer<T, Buffer, T>::serialize(data, m_buf);
+    type::TypeSerializer<T, Buffer>::serialize(data, m_buf);
     return *this;
   }
 
   template<typename T>
   Serializer& operator>>(T& dst) {
-    type::TypeSerializer<T, Buffer, T>::deserialize(dst, m_buf);
+    type::TypeSerializer<T, Buffer>::deserialize(dst, m_buf);
     return *this;
   }
 
