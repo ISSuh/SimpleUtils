@@ -42,12 +42,10 @@ template<typename T, typename B>
 class TypeSerializer<T, B, typename helper::IntTraits<T>::type> {
  public:
   static void serialize(const T& data, B& buf) {
-    std::cout << "int\n";
     buf.write(data);
   }
 
   static void deserialize(T& dst, B& buf) {
-    std::cout << "int\n";
     buf.read(dst);
   }
 };

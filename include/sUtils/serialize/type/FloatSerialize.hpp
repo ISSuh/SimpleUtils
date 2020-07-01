@@ -38,12 +38,10 @@ template<typename T, typename B>
 class TypeSerializer<T, B, typename helper::FloatTraits<T>::type> {
  public:
   static void serialize(const T& data, B& buf) {
-    std::cout << "float\n";
     buf.write(data);
   }
 
   static void deserialize(T& dst, B& buf) {
-    std::cout << "float\n";
     buf.read(dst);
   }
 };

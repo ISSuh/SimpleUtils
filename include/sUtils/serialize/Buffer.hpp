@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <utility>
 
+#include "type/helper/Common.hpp"
 #include "type/TypeSerializer.hpp"
 
 namespace sUtils {
@@ -20,12 +21,7 @@ namespace sUtils {
 class Buffer {
  public:
   Buffer() : m_argCount(0), m_argHead(-1)  {}
-  explicit Buffer(size_t size) : m_buf(std::vector<char>(size)),
-                                 m_argCount(0),
-                                 m_argHead(-1) {}
-  ~Buffer() {
-    clear();
-  }
+  ~Buffer() { clear(); }
 
   template<typename T>
   void write(const T& value) {
@@ -38,27 +34,27 @@ class Buffer {
     const char* p = reinterpret_cast<const char*>(&value);
     std::copy(p, p + len, std::back_inserter(m_buf));
 
-    updateBufferByteInfo(len);
+    writeBufferByteInfo(len);
   }
 
   template<typename T>
   void read(T& dst) {
-    size_t size = sizeof(dst);
-    read(dst, size);
-  }
-
-  template<typename T>
-  void read(T& dst, size_t len) {
-    if (len > static_cast<uint32_t>(m_buf.size())) {
-      throw "Out of Range";
-    }
-
-    auto beginBytePos = m_argByteRange.front().first;
-    auto endBytePos = m_argByteRange.front().second;
+    auto beginBytePos = m_byteRange.front().first;
+    auto endBytePos = m_byteRange.front().second;
 
     std::copy(&m_buf[beginBytePos], &m_buf[endBytePos] + 1, reinterpret_cast<char*>(&dst));
 
-    updateBufferByteInfo();
+    readBufferByteInfo();
+  }
+
+  template<typename T>
+  void read(T* dst) {
+    auto beginBytePos = m_byteRange.front().first;
+    auto endBytePos = m_byteRange.front().second;
+
+    std::copy(&m_buf[beginBytePos], &m_buf[endBytePos] + 1, reinterpret_cast<char*>(dst));
+
+    readBufferByteInfo();
   }
 
   void clear() {
@@ -67,28 +63,34 @@ class Buffer {
     clearBufferByteInfo();
   }
 
-  const std::string& toString() {
-    return std::move(std::string(m_buf.begin(), m_buf.end()));
-  }
+  const std::string& toString() { return std::move(std::string(m_buf.begin(), m_buf.end())); }
 
-  void fromString(const std::string& serializedValue) {
-    write(serializedValue);
-  }
+  size_t size() const { return m_buf.size(); }
+  size_t count() const { return m_argCount; }
+  const buffer::ByteRangeVector& getAllByteInfo() const { return m_byteRange; }
+  std::pair<size_t, size_t> getByteInfo() const {
+    if (m_argCount <= 0) {
+      return {-1, -1};
+    }
 
-  size_t getCount() const { return m_argCount; }
+    return m_byteRange[m_argHead];
+  }
 
  private:
-  void updateBufferByteInfo(size_t len) {
-    auto nextBytePos = m_argCount == 0 ? 0 : m_argByteRange.back().second + 1;
+  void writeBufferByteInfo(size_t len) {
+    auto nextBytePos = m_argCount == 0 ? 0 : m_byteRange.back().second + 1;
 
-    m_argByteRange.emplace(std::make_pair(nextBytePos, nextBytePos + len - 1));
+    m_byteRange.emplace_back(std::make_pair(nextBytePos, nextBytePos + len - 1));
 
     ++m_argHead;
     ++m_argCount;
   }
 
-  void updateBufferByteInfo() {
-    m_argByteRange.pop();
+  void readBufferByteInfo() {
+    if (!m_byteRange.empty()) {
+      m_byteRange.erase(m_byteRange.begin());
+    }
+
     --m_argHead;
     --m_argCount;
 
@@ -98,8 +100,7 @@ class Buffer {
   }
 
   void clearBufferByteInfo() {
-    std::queue<std::pair<size_t, size_t>> empty;
-    std::swap(m_argByteRange, empty);
+    m_byteRange.clear();
 
     m_argHead = -1;
     m_argCount = 0;
@@ -108,32 +109,20 @@ class Buffer {
  private:
   std::vector<char> m_buf;
 
-  std::queue<std::pair<size_t, size_t>> m_argByteRange;
+  buffer::ByteRangeVector m_byteRange;
   size_t m_argCount;
   int32_t m_argHead;
 };
 
-template<>
-inline void Buffer::write(const std::string& value, size_t len) {
-  const char* p = value.c_str();
-  std::copy(p, p + len, std::back_inserter(m_buf));
+// template<>
+// inline void Buffer::read(std::string& dst) {
+//   auto beginBytePos = m_byteRange.front().first;
+//   auto endBytePos = m_byteRange.front().second;
 
-  updateBufferByteInfo(len);
-}
+//   std::copy(&m_buf[beginBytePos], &m_buf[endBytePos] + 1, std::back_inserter(dst));
 
-template<>
-inline void Buffer::read(std::string& dst, size_t len) {
-  if (len > static_cast<uint32_t>(m_buf.size())) {
-    throw "Out of Range";
-  }
-
-  auto beginBytePos = m_argByteRange.front().first;
-  auto endBytePos = m_argByteRange.front().second + 1;
-
-  std::copy(&m_buf[beginBytePos], &m_buf[endBytePos], std::back_inserter(dst));
-
-  updateBufferByteInfo();
-}
+//   readBufferByteInfo();
+// }
 
 }  // namespace sUtils
 

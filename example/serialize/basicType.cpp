@@ -15,16 +15,19 @@ int main() {
   sUtils::Serializer serializer;
 
   uint32_t s1 = 300;
-  float s2 = 1.1;
+  const std::string s2 = "const string";
+  std::string s3 = "string";
 
   uint32_t d1 = 0;
-  float d2 = 0;
+  std::string d2;
+  std::string d3;
 
-  serializer << s1 << s2;
-  serializer >> d1 >> d2;
+  serializer << s1 << s2 << s3;
+  serializer >> d1 >> d2 >> d3;
 
   std::cout << s1 << " / " << d1 << std::endl;
   std::cout << s2 << " / " << d2 << std::endl;
+  std::cout << s3 << " / " << d3 << std::endl;
 
   return 0;
 }

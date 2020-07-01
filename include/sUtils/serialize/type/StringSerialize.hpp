@@ -24,7 +24,7 @@ class TypeSerializer<char*, B> {
   }
 
   static void deserialize(char* dst, B& buf) {
-    buf.read(dst, strlen(dst));
+    buf.read(dst);
   }
 };
 
@@ -32,11 +32,11 @@ template<typename B>
 class TypeSerializer<std::string, B> {
  public:
   static void serialize(const std::string& data, B& buf) {
-    buf.write(data, data.length());
+    buf.write(data.data(), data.length());
   }
 
   static void deserialize(std::string& dst, B& buf) {
-    buf.read(dst, dst.length());
+    buf.read(dst[0]);
   }
 };
 
