@@ -47,16 +47,6 @@ class Buffer {
     readBufferByteInfo();
   }
 
-  template<typename T>
-  void read(T* dst) {
-    auto beginBytePos = m_byteRange.front().first;
-    auto endBytePos = m_byteRange.front().second;
-
-    std::copy(&m_buf[beginBytePos], &m_buf[endBytePos] + 1, reinterpret_cast<char*>(dst));
-
-    readBufferByteInfo();
-  }
-
   void clear() {
     m_buf.clear();
 
@@ -114,15 +104,15 @@ class Buffer {
   int32_t m_argHead;
 };
 
-// template<>
-// inline void Buffer::read(std::string& dst) {
-//   auto beginBytePos = m_byteRange.front().first;
-//   auto endBytePos = m_byteRange.front().second;
+template<>
+inline void Buffer::read(std::string& dst) {
+  auto beginBytePos = m_byteRange.front().first;
+  auto endBytePos = m_byteRange.front().second;
 
-//   std::copy(&m_buf[beginBytePos], &m_buf[endBytePos] + 1, std::back_inserter(dst));
+  std::copy(&m_buf[beginBytePos], &m_buf[endBytePos] + 1, std::back_inserter(dst));
 
-//   readBufferByteInfo();
-// }
+  readBufferByteInfo();
+}
 
 }  // namespace sUtils
 
