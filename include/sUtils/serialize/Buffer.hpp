@@ -105,6 +105,14 @@ class Buffer {
 };
 
 template<>
+inline void Buffer::write(const std::string& value, size_t len) {
+  const char* p = value.c_str();
+  std::copy(p, p + len, std::back_inserter(m_buf));
+
+  writeBufferByteInfo(len);
+}
+
+template<>
 inline void Buffer::read(std::string& dst) {
   auto beginBytePos = m_byteRange.front().first;
   auto endBytePos = m_byteRange.front().second;
