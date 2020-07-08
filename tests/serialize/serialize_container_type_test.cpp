@@ -5,6 +5,7 @@
  */
 
 #include <vector>
+#include <array>
 
 #include <sUtils/serialize/Serializer.hpp>
 #include <gtest/gtest.h>
@@ -42,6 +43,20 @@ TEST(Serialize, STRING_VECTOR) {
 
   std::vector<std::string> s = {"Aa", "Bdasdasd", "Ccccsa", "Degtr", "E12134"};
   std::vector<std::string> d;
+
+  serializer << s;
+  serializer >> d;
+
+  for (size_t i = 0 ; i < s.size() ; ++i) {
+    ASSERT_EQ(s[i], d[i]);
+  }
+}
+
+TEST(Serialize, UINT_ARRAY) {
+  sUtils::Serializer serializer;
+
+  std::array<uint32_t, 5> s = {1, 2, 3, 4, 5};
+  std::array<uint32_t, 5> d;
 
   serializer << s;
   serializer >> d;
