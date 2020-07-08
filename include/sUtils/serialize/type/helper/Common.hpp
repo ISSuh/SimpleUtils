@@ -7,9 +7,17 @@
 #ifndef SUTILS_SERIALIZE_TYPE_HELPER_COMMON_HPP_
 #define SUTILS_SERIALIZE_TYPE_HELPER_COMMON_HPP_
 
-#include <type_traits>
+#include <vector>
+#include <utility>
 
 namespace sUtils {
+
+namespace buffer {
+
+using ByteRangeVector = std::vector<std::pair<size_t, size_t>>;
+
+}  // namespace buffer
+
 namespace type {
 namespace helper {
 

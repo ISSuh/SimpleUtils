@@ -17,18 +17,6 @@ namespace sUtils {
 namespace type {
 
 template<typename B>
-class TypeSerializer<char*, B> {
- public:
-  static void serialize(const char* data, B& buf) {
-    buf.write(data, strlen(data));
-  }
-
-  static void deserialize(char* dst, B& buf) {
-    buf.read(dst, strlen(dst));
-  }
-};
-
-template<typename B>
 class TypeSerializer<std::string, B> {
  public:
   static void serialize(const std::string& data, B& buf) {
@@ -36,7 +24,7 @@ class TypeSerializer<std::string, B> {
   }
 
   static void deserialize(std::string& dst, B& buf) {
-    buf.read(dst, dst.length());
+    buf.read(dst);
   }
 };
 
