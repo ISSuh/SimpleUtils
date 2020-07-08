@@ -26,7 +26,7 @@ struct VectorTraits : TypeTraits<T> {};
 template <typename T>
 struct VectorTraits<T, typename std::enable_if<is_vector<T>::value>::type> {
   static constexpr bool valid = true;
-  using type = T;
+  using type = typename std::enable_if<is_vector<T>::value>::type;
 };
 
 }  // namespace helper
