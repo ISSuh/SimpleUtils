@@ -66,6 +66,20 @@ TEST(Serialize, UINT_ARRAY) {
   }
 }
 
+TEST(Serialize, DOUBLE_ARRAY) {
+  sUtils::Serializer serializer;
+
+  std::array<double, 5> s = {1.1, 2.2, 3.3, 4.4, 5.5};
+  std::array<double, 5> d;
+
+  serializer << s;
+  serializer >> d;
+
+  for (size_t i = 0 ; i < s.size() ; ++i) {
+    ASSERT_EQ(s[i], d[i]);
+  }
+}
+
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
