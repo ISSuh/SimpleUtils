@@ -55,7 +55,6 @@ class TypeSerializer<std::vector<std::string>, B> {
   }
 
   static void deserialize(std::vector<std::string>& dst, B& buf) {
-    
     buf.read(dst);
   }
 };

@@ -1,0 +1,31 @@
+@startuml sUtils_serialize
+
+node "Serilizer Class" as serializeClass {
+  interface "serialize" as serialize
+  interface "deserialize" as deserialize
+
+  node "TypeSerilize Class" as typeSerializeClass{
+    [ContainerTypeSerialize]
+    [BasicTypeSerialize]
+
+    [ContainerTypeSerialize] -down-> [BasicTypeSerialize]
+  }
+
+  node "Buffer Class" as bufferClass{
+    interface "write" as write
+    interface "read" as read 
+  }
+
+  ' serialize -[hidden]left-> deserialize
+
+  serialize -down-> typeSerializeClass
+  serialize -[hidden]down-> ContainerTypeSerialize
+
+  deserialize <-down- typeSerializeClass
+  deserialize -[hidden]down-> ContainerTypeSerialize
+
+  BasicTypeSerialize -down-> write
+  BasicTypeSerialize <-down- read
+}
+
+@enduml
