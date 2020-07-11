@@ -16,7 +16,9 @@
 #include "StringSerialize.hpp"
 
 // Container Type
-// #include "VectorSerialize.hpp"
-// #include "ArraySerialize.hpp"
+#include "VectorSerialize.hpp"
+#include "ArraySerialize.hpp"
+#include "SetSerialize.hpp"
+#include "MapSerialize.hpp"
 
 #endif  // SUTILS_SERIALIZE_TYPE_TYPE_HPP_

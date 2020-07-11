@@ -17,28 +17,30 @@ namespace type {
 
 namespace helper {
 
-template <typename T>
-using is_array = std::is_same<T, std::array<typename T::value_type, 0>>;
+// template <typename T>
+// using is_array = std::is_same<T, std::array<typename T::value_type, 0>>;
 
-template <typename T, typename ENABLE = void>
-struct ArrayTraits : TypeTraits<T> {};
+// template <typename T, typename ENABLE = void>
+// struct ArrayTraits : TypeTraits<T> {};
 
-template <typename T>
-struct ArrayTraits<T, typename std::enable_if<is_array<T>::value>::type> {
-  static constexpr bool valid = true;
-  using type = typename std::enable_if<is_array<T>::value>::type;
-};
+// template <typename T>
+// struct ArrayTraits<T, typename std::enable_if<is_array<T>::value>::type> {
+//   static constexpr bool valid = true;
+//   using type = typename std::enable_if<is_array<T>::value>::type;
+// };
 
 }  // namespace helper
 
-template<typename T, typename B>
-class TypeSerializer<T, B, typename helper::ArrayTraits<T>::type> {
+template<typename T, typename B, size_t N>
+class TypeSerializer<std::array<T, N>, B> {
  public:
-  static void serialize(const T& data, B& buf) {
+  static void serialize(const std::array<T, N>& data, B& buf) {
+    std::cout << "array contailner\n";
     buf.write(data);
   }
 
-  static void deserialize(T& dst, B& buf) {
+  static void deserialize(std::array<T, N>& dst, B& buf) {
+    std::cout << "array contailner\n";
     buf.read(dst);
   }
 };

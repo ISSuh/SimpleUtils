@@ -110,6 +110,8 @@ inline void Buffer::write(const std::string& value, size_t len) {
   std::copy(p, p + len, std::back_inserter(m_buf));
 
   writeBufferByteInfo(len);
+
+  std::cout << m_buf.size() << std::endl;
 }
 
 template<>

@@ -13,15 +13,6 @@
 
 #include <sUtils/serialize/Serializer.hpp>
 
-class test {
- public:
-  void setTest(int val) {
-    m_test = val;
-  }
-
-  int m_test = 0;
-};
-
 int main() {
   std::cout << "=========================================\n";
   std::cout << "Serialize Example - Container Type\n";
@@ -64,21 +55,6 @@ int main() {
   for (size_t i = 1 ; i <= 5 ; ++i) {
     std::cout << "map : [" << i << "] : " <<  mapS[i] << " / " << mapD[i] << std::endl;
   }
-
-  test tes;
-  tes.setTest(10);
-
-  std::map<uint32_t, test> mapS1;
-  mapS1[0] = tes;
-
-  std::map<uint32_t, test> mapD1;
-
-  serializer << mapS1;
-  serializer >> mapD1;
-
-  std::cout << mapS1.at(0).m_test << " / " << mapD1.at(0).m_test << std::endl;
-
-
 
   return 0;
 }

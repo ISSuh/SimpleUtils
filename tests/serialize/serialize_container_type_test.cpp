@@ -6,6 +6,8 @@
 
 #include <vector>
 #include <array>
+#include <map>
+#include <set>
 
 #include <sUtils/serialize/Serializer.hpp>
 #include <gtest/gtest.h>
@@ -77,6 +79,44 @@ TEST(Serialize, DOUBLE_ARRAY) {
 
   for (size_t i = 0 ; i < s.size() ; ++i) {
     ASSERT_EQ(s[i], d[i]);
+  }
+}
+
+TEST(Serialize, UINT_SET) {
+  sUtils::Serializer serializer;
+
+  std::set<uint32_t> s = {1, 2, 3, 4, 5};
+  std::set<uint32_t> d;
+
+  serializer << s;
+  serializer >> d;
+
+  auto sIter = s.begin();
+  auto dIter = d.begin();
+
+  for (size_t i = 0 ; i < s.size() ; ++i) {
+    ASSERT_EQ(*sIter, *dIter);
+    sIter++;
+    dIter++;
+  }
+}
+
+TEST(Serialize, DOUBLE_SET) {
+  sUtils::Serializer serializer;
+
+  std::set<double> s = {1.1, 2.2, 3.3, 4.4, 5.5};
+  std::set<double> d;
+
+  serializer << s;
+  serializer >> d;
+
+  auto sIter = s.begin();
+  auto dIter = d.begin();
+
+  for (size_t i = 0 ; i < s.size() ; ++i) {
+    ASSERT_EQ(*sIter, *dIter);
+    sIter++;
+    dIter++;
   }
 }
 
