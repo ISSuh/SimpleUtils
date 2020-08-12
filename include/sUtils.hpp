@@ -13,5 +13,7 @@
 // Serialize
 #include "sUtils/serialize/Serializer.hpp"
 
+// ThreadPool
+#include "sUtils/threadPool/ThreadPool.hpp"
 
 #endif  // SUTILS_HPP_
