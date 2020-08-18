@@ -49,29 +49,9 @@ class ThreadPool {
     }
 
     using returnType = typename std::result_of<F(Args...)>::type;
+
     auto task = std::make_shared<std::packaged_task<returnType()>>(
                   std::bind(std::forward<F>(func), std::forward<Args>(args)...));
-    std::future<returnType> taskReturn = task->get_future();
-
-    {
-      std::lock_guard<std::mutex> lock(m_mutex);
-      m_taskQueue.push([task](){ (*task)(); });
-    }
-
-    m_cv.notify_one();
-
-    return taskReturn;
-  }
-
-  template<class C, class F, class ...Args>
-  std::future<typename std::result_of<std::declval<C>().F(Args...)>::type> pushTask(C&& obj, F&& func, Args&&... args) {
-    if (m_stop) {
-      throw std::runtime_error("Terminate ThreadPool");
-    }
-
-    using returnType = typename std::result_of<std::declval<C>().F(Args...)>::type;
-    auto task = std::make_shared<std::packaged_task<returnType()>>(
-                  std::bind(std::forward<F>(func), std::forward(obj), std::forward<Args>(args)...));
     std::future<returnType> taskReturn = task->get_future();
 
     {

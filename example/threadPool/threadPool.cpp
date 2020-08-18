@@ -12,8 +12,6 @@
 
 class Test {
  public:
-  Test() = delete;
-
   std::string test(int a, const std::string& s) {
     return std::to_string(a) + " -> " + s;
   }
@@ -34,10 +32,7 @@ int main() {
   std::cout << threadPool.pushTask(&mul, 8, 2).get() << std::endl;
 
   Test t;
-  // auto func = std::bind(&Test::test, &t, std::placeholders::_1, std::placeholders::_2);
-  std::cout << threadPool.pushTask(&t, &Test::test, 1, "asidna").get() << std::endl;
-
-  using returnType = std::decltype(std::declval<Test>(int, const std::string&).test());
+  std::cout << threadPool.pushTask(&Test::test, &t, 1, "asidna").get() << std::endl;
 
   return 0;
 }
