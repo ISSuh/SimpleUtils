@@ -5,6 +5,8 @@
  */
 
 #include <iostream>
+#include <functional>
+#include <utility>
 
 #include <sUtils/threadPool/ThreadPool.hpp>
 
@@ -22,15 +24,18 @@ double mul(double a, double b) { return a * b; }
 int main() {
   sUtils::ThreadPool threadPool(3);
 
-  std::cout << threadPool.pushTask(sum, 1, 8).get() << std::endl;
-  std::cout << threadPool.pushTask(sub, 8, 6).get() << std::endl;
-  std::cout << threadPool.pushTask(mul, 8, 6).get() << std::endl;
-  std::cout << threadPool.pushTask(sum, 6, 25).get() << std::endl;
-  std::cout << threadPool.pushTask(sub, 94, 10).get() << std::endl;
-  std::cout << threadPool.pushTask(mul, 8, 2).get() << std::endl;
+  std::cout << threadPool.pushTask(&sum, 1, 8).get() << std::endl;
+  std::cout << threadPool.pushTask(&sub, 8, 6).get() << std::endl;
+  std::cout << threadPool.pushTask(&mul, 8, 6).get() << std::endl;
+  std::cout << threadPool.pushTask(&sum, 6, 25).get() << std::endl;
+  std::cout << threadPool.pushTask(&sub, 94, 10).get() << std::endl;
+  std::cout << threadPool.pushTask(&mul, 8, 2).get() << std::endl;
 
   Test t;
+  // auto func = std::bind(&Test::test, &t, std::placeholders::_1, std::placeholders::_2);
   std::cout << threadPool.pushTask(&t, &Test::test, 1, "asidna").get() << std::endl;
+
+  using returnType = typename std::result_of<std::declval<Test>(). test(int, const std::string&)>::type;
 
   return 0;
 }

@@ -6,6 +6,7 @@ PROJECT (SimpleUtils)
 #-------------------------------------------------------------------------------
 SET( CMAKE_CXX_STANDARD 11)
 SET( CMAKE_CXX_STANDARD_REQUIRED ON )
+SET( CMAKE_MAKE_PROGRAM="make -j 24" )
 ADD_COMPILE_OPTIONS ( -g -Wall -Wextra )
 
 #-------------------------------------------------------------------------------
