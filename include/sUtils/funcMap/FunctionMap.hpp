@@ -7,123 +7,112 @@
 #ifndef SUTILS_FUNCMAP_FUNCTIONMAP_HPP_
 #define SUTILS_FUNCMAP_FUNCTIONMAP_HPP_
 
-#include <iostream>
 #include <string>
+#include <vector>
 #include <map>
+#include <queue>
+#include <thread>
 #include <functional>
 #include <utility>
-#include <tuple>
-
-#include "helper/Helper.hpp"
-#include "Stream.hpp"
+#include <memory>
+#include <future>
+#include <condition_variable>
 
 namespace sUtils {
 
-class FunctionMapper {
- public:
-  FunctionMapper() = default;
-  ~FunctionMapper() = default;
+struct return_void {};
+struct return_non_void{};
 
-  template<typename F, typename ...Args>
-  void bindFunction(const std::string& name, F f) {
-    registFunction(name,
-                   f,
-                   typename helper::FuncTraits<decltype(f)>::return_type_info(),
-                   typename helper::FuncTraits<decltype(f)>::arg_count_info());
-  }
-
-  void call(const std::string& name) {
-    m_functionMap[name](nullptr);
-  }
-
-  void call(const std::string& name, stream::Stream& serial) {
-    m_functionMap[name](&serial);
-  }
-
-  template<typename Arg>
-  void call(const std::string& name, Arg&& arg) {
-    stream::Stream serial;
-    helper::ParamPack::serialize(serial, arg);
-
-    call(name, serial);
-  }
-
-  template<typename Arg, typename ...Args>
-  void call(const std::string& name, stream::Stream& serial, Arg&& arg) {
-    helper::ParamPack::serialize(serial, arg);
-
-    m_functionMap[name](&serial);
-  }
-
-  template<typename Arg, typename ...Args>
-  void call(const std::string& name, stream::Stream& serial, Arg&& arg, Args&& ...args) {
-    helper::ParamPack::serialize(serial, arg);
-
-    call(name, serial, args...);
-  }
-
-  template<typename Arg, typename ...Args>
-  void call(const std::string& name, Arg&& arg, Args&& ...args) {
-    stream::Stream serial;
-    helper::ParamPack::serialize(serial, arg);
-
-    call(name, serial, args...);
-  }
-
- private:
-  template<typename F>
-  struct Invoker {
-    static void noMember(F f, stream::Stream* s) {
-      using traits = helper::FuncTraits<decltype(f)>;
-      static_assert(traits::valid, "Invalid");
-
-      typename traits::param_tuple parmasTuple;
-      helper::TypeTraits<decltype(parmasTuple)>::read(*s, parmasTuple);
-
-      helper::callMethod(f, std::move(parmasTuple));
-    }
-  };
-
- private:
-  template<typename F>
-  void registFunction(const std::string& name, F f,
-                      typename helper::return_void const &,
-                      typename helper::arg_count_zero const &) {
-    m_functionMap[name] = {
-      std::bind(&Invoker<F>::noMember, f, std::placeholders::_1)
-    };
-  }
-
-  template<typename F>
-  void registFunction(const std::string& name, F f,
-                      typename helper::return_non_void const &,
-                      typename helper::arg_count_zero const &) {
-    m_functionMap[name] = {
-      std::bind(&Invoker<F>::noMember, f, std::placeholders::_1)
-    };
-  }
-
-  template<typename F>
-  void registFunction(const std::string& name, F f,
-                      typename helper::return_void const &,
-                      typename helper::arg_count_non_zero const &) {
-    m_functionMap[name] = {
-      std::bind(&Invoker<F>::noMember, f, std::placeholders::_1)
-    };
-  }
-
-  template<typename F>
-  void registFunction(const std::string& name, F f,
-                      typename helper::return_non_void const &,
-                      typename helper::arg_count_non_zero const &) {
-    m_functionMap[name] = {
-      std::bind(&Invoker<F>::noMember, f, std::placeholders::_1)
-    };
-  }
-
- private:
-  std::map<std::string, std::function<void(stream::Stream*)>> m_functionMap;
+template<typename R> struct FunctReturnTrait {
+  using type = return_non_void;
 };
+
+template<> struct FunctReturnTrait<void> {
+  using type = return_void;
+};
+
+template <typename F> struct FuncTraits {};
+
+// function
+template <typename R, typename... Args>
+struct FuncTraits<R(Args...)> {
+  using return_type = R;
+  using return_type_info = typename FunctReturnTrait<return_type>::type;
+};
+
+// function pointer
+template <typename R, typename... Args>
+struct FuncTraits<R(*)(Args...)> : public FuncTraits<R(Args...)> {};
+
+// class member method pointer
+template <typename R, typename C, typename... Args>
+struct FuncTraits<R (C::*)(Args...)> : public FuncTraits<R(Args...)> {
+  using class_type = C;
+};
+
+// const class member method pointer
+template <typename R, typename C, typename... Args>
+struct FuncTraits<R (C::*)(Args...) const> : public FuncTraits<R(Args...)> {
+  using class_type = C;
+};
+
+// lambda fucntion
+template <typename T>
+struct FunctionTraits : public FuncTraits<decltype(&T::operator())> {};
+
+class Function {
+ public:
+  Function() = default;
+  ~Function() = default;
+
+  template<class F>
+  void regist(F&& func) {
+    using returnType = typename std::result_of<F(Args...)>::type;
+    auto task = std::make_shared<std::packaged_task<returnType()>>(
+                  std::bind(std::forward<F>(func), std::forward<Args>(args)...));
+
+    m_funcWrapper = [task](){ (*task)(); };
+  }
+
+ private:
+  std::string m_functionName;
+  std::function<void()> m_funcWrapper;
+};
+
+// class FunctionMapper {
+//  public:
+//   FunctionMapper() = default;
+//   ~FunctionMapper() = default;
+
+//   template<class F, class ...Args>
+//   void regiset(const std::string& name, F&& func, Args&&... args) {
+//     using returnType = typename std::result_of<F(Args...)>::type;
+
+//     auto task = std::make_shared<std::packaged_task<returnType()>>(
+//                   std::bind(std::forward<F>(func), std::forward<Args>(args)...));
+//     std::future<returnType> taskReturn = task->get_future();
+
+//     m_map.insert({name, [task](){ (*task)(); });
+//   }
+
+//   void unRegist() {
+
+//   }
+
+//   template<class R>
+//   R call(const std::string& name) {
+//     return m_map[name];
+//   }
+
+//   bool has() {
+
+//   }
+
+//  private:
+
+//  private:
+//   std::map<std::string, std::function<void()>> m_map;
+// };
 
 }  // namespace sUtils
 
