@@ -16,4 +16,7 @@
 // ThreadPool
 #include "sUtils/threadPool/ThreadPool.hpp"
 
+// timer
+#include "sUtils/timer/Timer.hpp"
+
 #endif  // SUTILS_HPP_

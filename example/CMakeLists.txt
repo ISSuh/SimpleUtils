@@ -3,9 +3,10 @@ project(example)
 message("SimpleUtils Examples")
 
 SET ( SUBDIRS
-    functionMap
+    # functionMap
     serialize
     threadPool
+    timer
 )
 
 foreach(SUBDIR ${SUBDIRS})
