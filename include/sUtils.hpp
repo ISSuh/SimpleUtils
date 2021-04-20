@@ -16,7 +16,16 @@
 // ThreadPool
 #include "sUtils/threadPool/ThreadPool.hpp"
 
+// // timer
+// #include "sUtils/timer/Timer.hpp"
+
+// // timer
+// #include "sUtils/sigslot/SigSlot.hpp"
+
+// // timer
+// #include "sUtils/runLoop/RunLoop.hpp"
+
 // timer
-#include "sUtils/timer/Timer.hpp"
+#include "sUtils/channel/channel.hpp"
 
 #endif  // SUTILS_HPP_

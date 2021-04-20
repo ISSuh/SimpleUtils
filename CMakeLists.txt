@@ -33,13 +33,13 @@ add_subdirectory(example)
 #-------------------------------------------------------------------------------
 # Set gTest
 #-------------------------------------------------------------------------------
-include(cmake/googletest.cmake)
+# include(cmake/googletest.cmake)
 
-fetch_googletest(
-    ${PROJECT_SOURCE_DIR}/cmake
-    ${PROJECT_BINARY_DIR}/googletest
-)
+# fetch_googletest(
+#     ${PROJECT_SOURCE_DIR}/cmake
+#     ${PROJECT_BINARY_DIR}/googletest
+# )
 
-enable_testing()
+# enable_testing()
 
-add_subdirectory(tests)
+# add_subdirectory(tests)

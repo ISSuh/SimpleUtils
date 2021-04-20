@@ -9,6 +9,14 @@
 
 namespace fsm {
 
+class State {
+
+};
+
+class StateMachine {
+  
+}
+
 }  // namespace fsm
 
 #endif  // SUTILS_FSM_FSM_HPP_

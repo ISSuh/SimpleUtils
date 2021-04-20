@@ -7,6 +7,8 @@ SET ( SUBDIRS
     serialize
     threadPool
     timer
+    sigslot
+    channel
 )
 
 foreach(SUBDIR ${SUBDIRS})
