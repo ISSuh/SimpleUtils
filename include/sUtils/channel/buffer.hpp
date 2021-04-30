@@ -10,8 +10,9 @@
 #include <stdint.h>
 
 #include <vector>
-#include <chrono>
 #include <atomic>
+#include <chrono>
+#include <algorithm>
 
 #include "lock.hpp"
 
@@ -26,8 +27,8 @@ class Counter {
 
   void Increase() { count_.fetch_add(1); }
   void Decrease() { count_.fetch_sub(1); }
-  
-  bool IsZero() { 
+
+  bool IsZero() {
     uint32_t expect = 0;
     return count_.compare_exchange_strong(expect, 0);
   }
@@ -45,7 +46,7 @@ struct Blob {
 };
 
 struct Bucket {
-  Lock lock;
+  RWLock lock;
   Counter semaphoe;
   Blob blob;
 };
@@ -62,23 +63,20 @@ class Memory {
   bool TryWrite(uint8_t* buf, size_t len, uint32_t* idx) {
     uint32_t index = *idx;
     Bucket& bucket = bucket_[index];
-    
+
+    if (!bucket.semaphoe.IsZero()) {
+      return false;
+    }
+
     {
       LockGuard bucket_lock_guard(bucket.lock);
-      
-      if (!bucket.semaphoe.IsZero()) {
-        return false;
-      }
-
+      std::cout << "index -" << index << " / after lock\n";
       bucket.blob.timestamp = NowTimestamp();
       bucket.blob.len = len;
       std::copy(buf, buf + len, bucket.blob.data);
-      
-      {
-        LockGuard memory_lock_guard(lock_);
-        *idx = index >= BUCKET_SIZE ? 0 : ++index;
-      }
-    }      
+
+      *idx = index >= BUCKET_SIZE ? 0 : ++index;
+    }
 
     return true;
   }
@@ -88,19 +86,17 @@ class Memory {
     Bucket& bucket = bucket_[index];
 
     {
-      LockGuard memory_lock_guard(lock_);
-
       bucket.semaphoe.Increase();
-      if (!bucket.lock.try_lock()) {
+      if (!bucket.lock.try_sharedable_lock()) {
         bucket.semaphoe.Decrease();
         return false;
       } else {
+        std::copy(bucket.blob.data, bucket.blob.data + bucket.blob.len, buf);
+        *len = bucket.blob.len;
+        *idx = index >= BUCKET_SIZE ? 0 : ++index;
+
         bucket.lock.unlock();
       }
-
-      std::copy(bucket.blob.data, bucket.blob.data + bucket.blob.len, buf);
-      *len = bucket.blob.len;
-      *idx = index >= BUCKET_SIZE ? 0 : ++index;
     }
 
     bucket.semaphoe.Decrease();
@@ -112,33 +108,9 @@ class Memory {
   uint32_t GetObserved() const { return observe_.GetCount(); }
 
  private:
-  Lock lock_;
+  RWLock lock_;
   Counter observe_;
   Bucket bucket_[BUCKET_SIZE];
 };
 
-class Buffer {
- public:
-  const size_t kDefaultMemorySize = 64 * 1024 * 1024;
-
-  Buffer() {}
-  ~Buffer() {}
-
-// #pragma pack(4)
-  struct Header {
-    uint64_t timestamp;
-    uint32_t len;
-    std::atomic<uint32_t> observed;
-    RWLock lock;
-    ConditionalVariable cv;
-  };
-// #pragma unpack()
-
-  size_t HeaderLen() { return sizeof(header_); }
-
- public:
-  Header header_;
-  uint8_t buf_[64 * 1024 * 1024];
-};
-
-#endif // SUTILS_CHNNEL_BUFFER_HPP_
+#endif  // SUTILS_CHNNEL_BUFFER_HPP_

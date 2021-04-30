@@ -62,7 +62,7 @@ class ShmSession : public Session {
 
     if (!ExsistCheck(topic)) {
       return CreateSession(topic);
-    } 
+    }
 
     return ConnetSession(topic);
   }
@@ -73,7 +73,7 @@ class ShmSession : public Session {
     if (!GetObserved()) {
       munmap(shm_, kDefaultMemorySize);
       shm_ = nullptr;
-      
+
       shm_unlink(topic_.c_str());
     }
   }
@@ -96,7 +96,7 @@ class ShmSession : public Session {
 
     return std::move("");
   }
- 
+
  private:
   bool CreateSession(const std::string& topic) {
     std::cout << "CreateSession\n";
@@ -115,7 +115,7 @@ class ShmSession : public Session {
 ;
     return true;
   }
-  
+
   bool ConnetSession(const std::string& topic) {
     std::cout << "CreateSession\n";
 
@@ -142,7 +142,7 @@ class ShmSession : public Session {
     // std::cout << "observed : " << shm_->header_.observed << std::endl;
 
     std::string tmp(data.begin(), data.end());
-    std::cout << "buf : " << tmp << std::endl;
+    std::cout << tmp << std::endl;
   }
 
  private:

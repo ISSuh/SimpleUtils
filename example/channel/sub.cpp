@@ -5,14 +5,14 @@
 #include <sUtils/channel/shared_mem_session.hpp>
 
 int main() {
-	ShmSession session;
+  ShmSession session;
 
-	session.Open("Test");
+  session.Open("Test");
 
-	while (1) {
-		session.Read();
-		// std::this_thread::sleep_for(std::chrono::milliseconds(5));
-	}
+  while (1) {
+    session.Read();
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+  }
 
-	session.Close();
+  session.Close();
 }

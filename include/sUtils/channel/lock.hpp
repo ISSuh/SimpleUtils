@@ -13,13 +13,13 @@
 
 class SpinLock {
  public:
-  SpinLock() : lock_(true){}
+  SpinLock() : lock_(true) {}
   ~SpinLock() {}
 
   void Lock() {
     do {
       std::chrono::nanoseconds(100);
-    } while(lock_.load(std::memory_order_acquire));
+    } while (lock_.load(std::memory_order_acquire));
   }
 
   bool TryLock() {
@@ -58,15 +58,6 @@ class Lock {
   pthread_mutexattr_t lock_attr_;
 };
 
-class LockGuard {
- public:
-  explicit LockGuard(Lock& lock) : lock_(lock) { lock.lock(); }
-  ~LockGuard() { lock_.unlock(); }
-
- private:
-  Lock& lock_;
-};
-
 class RWLock {
  public:
   RWLock() {
@@ -80,13 +71,31 @@ class RWLock {
     pthread_rwlock_destroy(&rwlock_);
   }
 
-  void lock() { pthread_rwlock_wrlock(&rwlock_); }
+  void lock() {
+    std::cout << "lock()\n";
+    auto ret = pthread_rwlock_wrlock(&rwlock_);
+    if (ret) {
+      std::cout << "ret : " << ret << "\n";
+    }
+  }
   bool try_lock() { return !pthread_rwlock_trywrlock(&rwlock_); }
 
-  void sharedable_lock() { pthread_rwlock_rdlock(&rwlock_); }
+  void sharedable_lock() {
+    std::cout << "sharedable_lock()\n";
+    auto ret = pthread_rwlock_rdlock(&rwlock_);
+    if (ret) {
+      std::cout << "ret : " << ret << "\n";
+    }
+  }
   bool try_sharedable_lock() { return !pthread_rwlock_tryrdlock(&rwlock_); }
 
-  void unlock() { pthread_rwlock_unlock(&rwlock_); }
+  void unlock() {
+    std::cout << "unlock()\n";
+    auto ret = pthread_rwlock_unlock(&rwlock_);
+    if (ret) {
+      std::cout << "ret : " << ret << "\n";
+    }
+  }
 
  private:
   pthread_rwlock_t rwlock_;
@@ -112,6 +121,21 @@ class ConditionalVariable {
  private:
   pthread_cond_t cond_;
   pthread_condattr_t cond_attr_;
+};
+
+class LockGuard {
+ public:
+  explicit LockGuard(RWLock& lock, bool read = false) : lock_(lock) {
+      if (read) {
+        lock.sharedable_lock();
+      } else {
+        lock.lock();
+      }
+    }
+  ~LockGuard() { lock_.unlock(); }
+
+ private:
+  RWLock& lock_;
 };
 
 #endif // SUTILS_CHNNEL_LOCK_HPP_
